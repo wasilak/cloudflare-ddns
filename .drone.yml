@@ -27,41 +27,41 @@ steps:
       base_url: https://git.wasil.org
       files:
         - /drone/src/dist/*
-      title: 0.0.7
-      note: test 1
+      title: 0.0.8
     when:
       event: tag
 
-# ---
-# kind: pipeline
-# name: armv7
+---
+kind: pipeline
+name: armv7
 
-# platform:
-#   os: linux
-#   arch: amd64
+workspace:
+  path: /drone/src
 
-# steps:
-# - name: build
-#   image: golang:latest
-#   commands:
-#     - go mod tidy
-#     - go build ./...
-#   environment:
-#     GOOS: linux
-#     GOARCH: arm
-#     GOARM: 7
+platform:
+  os: linux
+  arch: amd64
 
-# - name: github_release
-#   pull: default
-#   image: plugins/github-release
-#   settings:
-#     files:
-#       from_secret: ""
-#       value:
-#       - "/go/bin/*"
-#   environment:
-#     GITHUB_TOKEN:
-#       from_secret: github_token
-#   when:
-#     event:
-#     - tag
+environment:
+  GOOS: linux
+  GOARCH: arm
+  GOARM: 7
+
+steps:
+  - name: build
+    image: golang:latest
+    commands:
+      - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM} ./... 
+      - ls -lha /drone/src
+
+  - name: gitea_release
+    image: plugins/gitea-release
+    settings:
+      api_key:
+         from_secret: gitea_token
+      base_url: https://git.wasil.org
+      files:
+        - /drone/src/dist/*
+      title: 0.0.8
+    when:
+      event: tag
