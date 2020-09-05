@@ -1,0 +1,50 @@
+kind: pipeline
+name: amd64
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  image: golang:latest
+  commands:
+    - go mod tidy
+    - go build ./...
+  environment:
+    GOOS: linux
+    GOARCH: amd64
+
+---
+kind: pipeline
+name: amrv7
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  image: golang:latest
+  commands:
+    - go mod tidy
+    - go build ./...
+  environment:
+    GOOS: linux
+    GOARCH: arm
+    GOARM: 7
+
+# - name: github_release
+#   pull: default
+#   image: plugins/github-release
+#   settings:
+#     files:
+#       from_secret: ""
+#       value:
+#       - "/go/bin/*"
+#   environment:
+#     GITHUB_TOKEN:
+#       from_secret: github_token
+#   when:
+#     event:
+#     - tag
