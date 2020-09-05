@@ -8,14 +8,15 @@ platform:
   os: linux
   arch: amd64
 
+environment:
+  GOOS: linux
+  GOARCH: amd64
+
 steps:
   - name: build
     image: golang:latest
     commands:
       - go build -o cloudflare-ddns-$${GOOS}-$${GOARCH} ./... 
-    environment:
-      GOOS: linux
-      GOARCH: amd64
 
   - name: gitea_release
     image: plugins/gitea-release
