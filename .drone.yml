@@ -41,7 +41,7 @@ steps:
         - sha512
         - adler32
         - crc32
-      title: 0.0.10
+      # title: 0.0.10
     when:
       event: tag
     depends_on:
