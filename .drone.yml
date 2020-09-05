@@ -27,7 +27,14 @@ steps:
       base_url: https://git.wasil.org
       files:
         - /drone/src/dist/*
-      title: 0.0.8
+      checksum:
+        - md5
+        - sha1
+        - sha256
+        - sha512
+        - adler32
+        - crc32
+      title: 0.0.9
     when:
       event: tag
 
@@ -62,6 +69,13 @@ steps:
       base_url: https://git.wasil.org
       files:
         - /drone/src/dist/*
-      title: 0.0.8
+      checksum:
+        - md5
+        - sha1
+        - sha256
+        - sha512
+        - adler32
+        - crc32
+      title: 0.0.9
     when:
       event: tag
