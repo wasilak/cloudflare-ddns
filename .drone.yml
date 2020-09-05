@@ -4,21 +4,32 @@ name: amd64
 # workspace:
 #   base: /go
 #   path: src/github.com/wasilak/buckytools
+# /drone/src
 
 platform:
   os: linux
   arch: amd64
 
 steps:
-- name: build
-  image: golang:latest
-  commands:
-    - pwd
-    # - go mod tidy
-    - go build ./...
-  environment:
-    GOOS: linux
-    GOARCH: amd64
+  - name: build
+    image: golang:latest
+    commands:
+      - go build ./... -o  cloudflare-ddns- $${GOOS}-$${GOARCH}
+    environment:
+      GOOS: linux
+      GOARCH: amd64
+
+  - name: gitea_release
+    image: plugins/gitea-release
+    settings:
+      # api_key: xxxxxxxx
+      base_url: https://git.wasil.org
+      files:
+        - cloudflare-ddns- $${GOOS}-$${GOARCH}
+      title: 0.0.1
+      note: test 1
+    # when:
+    #   event: tag
 
 # ---
 # kind: pipeline
