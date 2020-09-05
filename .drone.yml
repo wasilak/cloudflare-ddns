@@ -1,10 +1,8 @@
 kind: pipeline
 name: amd64
 
-# workspace:
-#   base: /go
-#   path: src/github.com/wasilak/buckytools
-# /drone/src
+workspace:
+  path: /drone/src
 
 platform:
   os: linux
