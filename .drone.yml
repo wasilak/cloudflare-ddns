@@ -1,5 +1,5 @@
 kind: pipeline
-name: amd64
+name: build & deploy
 
 workspace:
   path: /drone/src
@@ -9,7 +9,7 @@ platform:
   arch: amd64
 
 steps:
-  - name: build linux amd64
+  - name: linux amd64
     image: golang:latest
     environment:
       GOOS: linux
@@ -17,7 +17,7 @@ steps:
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH} ./... 
 
-  - name: build linux armv7
+  - name: linux armv7
     image: golang:latest
     environment:
       GOOS: linux
@@ -26,7 +26,7 @@ steps:
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM} ./... 
 
-  - name: gitea_release
+  - name: deploy to gitea
     image: plugins/gitea-release
     settings:
       api_key:
@@ -45,5 +45,5 @@ steps:
     when:
       event: tag
     depends_on:
-      - build linux amd64
-      - build linux armv7
+      - linux amd64
+      - linux armv7
