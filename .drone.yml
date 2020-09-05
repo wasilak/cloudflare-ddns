@@ -22,7 +22,8 @@ steps:
   - name: gitea_release
     image: plugins/gitea-release
     settings:
-      # api_key: xxxxxxxx
+      api_key:
+         from_secret: gitea_token
       base_url: https://git.wasil.org
       files:
         - cloudflare-ddns- $${GOOS}-$${GOARCH}
