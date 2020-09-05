@@ -26,7 +26,7 @@ steps:
       base_url: https://git.wasil.org
       files:
         - cloudflare-ddns-$${GOOS}-$${GOARCH}
-      title: 0.0.4
+      title: 0.0.6
       note: test 1
     when:
       event: tag
