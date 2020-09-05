@@ -16,7 +16,7 @@ steps:
   - name: build
     image: golang:latest
     commands:
-      - go build -o cloudflare-ddns-$${GOOS}-$${GOARCH} ./... 
+      - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH} ./... 
       - ls -lha /drone/src
 
   - name: gitea_release
@@ -26,8 +26,8 @@ steps:
          from_secret: gitea_token
       base_url: https://git.wasil.org
       files:
-        - cloudflare-ddns-$${GOOS}-$${GOARCH}
-      title: 0.0.6
+        - /drone/src/dist/*
+      title: 0.0.7
       note: test 1
     when:
       event: tag
