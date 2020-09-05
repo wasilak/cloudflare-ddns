@@ -8,58 +8,23 @@ platform:
   os: linux
   arch: amd64
 
-environment:
-  GOOS: linux
-  GOARCH: amd64
-
 steps:
-  - name: build
+  - name: build linux amd64
     image: golang:latest
+    environment:
+      GOOS: linux
+      GOARCH: amd64
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH} ./... 
-      - ls -lha /drone/src
 
-  - name: gitea_release
-    image: plugins/gitea-release
-    settings:
-      api_key:
-         from_secret: gitea_token
-      base_url: https://git.wasil.org
-      files:
-        - /drone/src/dist/*
-      checksum:
-        - md5
-        - sha1
-        - sha256
-        - sha512
-        - adler32
-        - crc32
-      title: 0.0.9
-    when:
-      event: tag
-
----
-kind: pipeline
-name: armv7
-
-workspace:
-  path: /drone/src
-
-platform:
-  os: linux
-  arch: amd64
-
-environment:
-  GOOS: linux
-  GOARCH: arm
-  GOARM: 7
-
-steps:
-  - name: build
+  - name: build linux armv7
     image: golang:latest
+    environment:
+      GOOS: linux
+      GOARCH: arm
+      GOARM: 7
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM} ./... 
-      - ls -lha /drone/src
 
   - name: gitea_release
     image: plugins/gitea-release
@@ -76,6 +41,9 @@ steps:
         - sha512
         - adler32
         - crc32
-      title: 0.0.9
+      title: 0.0.10
     when:
       event: tag
+    depends_on:
+      - build linux amd64
+      - build linux armv7
