@@ -28,8 +28,8 @@ steps:
         - cloudflare-ddns- $${GOOS}-$${GOARCH}
       title: 0.0.1
       note: test 1
-    # when:
-    #   event: tag
+    when:
+      event: tag
 
 # ---
 # kind: pipeline
