@@ -25,6 +25,14 @@ steps:
       GOARM: 7
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM} ./...
+  
+  - name: linux arm64
+    image: golang:latest
+    environment:
+      GOOS: linux
+      GOARCH: arm64
+    commands:
+      - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH} ./...
 
   - name: deploy to gitea
     image: plugins/gitea-release
@@ -47,3 +55,4 @@ steps:
     depends_on:
       - linux amd64
       - linux armv7
+      - linux arm64
