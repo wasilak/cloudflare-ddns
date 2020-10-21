@@ -1,4 +1,5 @@
 kind: pipeline
+type: docker
 name: build & deploy
 
 workspace:
@@ -42,6 +43,9 @@ steps:
       base_url: https://git.wasil.org
       files:
         - /drone/src/dist/*
+      title: 0.0.13
+      note: CHANGELOG_LAST.md # git changelog -s 0.0.13 -f 0.0.13 -l -p CHANGELOG_LAST.md
+      # note: CHANGELOG.md # git changelog -a -p CHANGELOG.md
       checksum:
         - md5
         - sha1
@@ -49,7 +53,6 @@ steps:
         - sha512
         - adler32
         - crc32
-      # title: 0.0.10
     when:
       event: tag
     depends_on:
