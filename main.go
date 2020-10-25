@@ -5,13 +5,34 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 
-	"github.com/cloudflare/cloudflare-go"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+
+	"github.com/wasilak/cloudflare-ddns/library/cf"
 )
+
+func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
+	proxied := item.(map[string]interface{})["proxied"].(bool)
+
+	record := cf.GetDNSRecord(recordName)
+	record.Type = item.(map[string]interface{})["type"].(string)
+	record.Proxied = proxied
+	record.TTL = item.(map[string]interface{})["ttl"].(int)
+
+	if nil != item.(map[string]interface{})["content"] {
+		record.Content = item.(map[string]interface{})["content"].(string)
+	} else {
+		record.Content = string(ip)
+	}
+
+	zoneName := item.(map[string]interface{})["zonename"].(string)
+	cf.RunDNSUpdate(string(ip), zoneName, record)
+	wg.Done()
+}
 
 func main() {
 
@@ -19,9 +40,9 @@ func main() {
 
 	viper.SetConfigName("config")                 // name of config file (without extension)
 	viper.SetConfigType("yaml")                   // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath("/etc/cloudflare-ddns/")  // path to look for the config file in
-	viper.AddConfigPath("$HOME/.cloudflare-ddns") // call multiple times to add many search paths
 	viper.AddConfigPath(".")                      // optionally look for config in the working directory
+	viper.AddConfigPath("$HOME/.cloudflare-ddns") // call multiple times to add many search paths
+	viper.AddConfigPath("/etc/cloudflare-ddns/")  // path to look for the config file in
 	viper.BindEnv("CF.APIKey", "CF_API_KEY")
 	viper.BindEnv("CF.APIEmail", "CF_API_EMAIL")
 	viperErr := viper.ReadInConfig() // Find and read the config file
@@ -29,9 +50,6 @@ func main() {
 		log.Fatal(viperErr)
 	}
 
-	viper.SetDefault("Record.TTL", 120)
-	viper.SetDefault("Record.Type", "A")
-	viper.SetDefault("Record.Proxied", false)
 	viper.SetDefault("LogFile", "/var/log/cloudflare-dns.log")
 
 	file, err := os.OpenFile(viper.GetString("LogFile"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -40,9 +58,6 @@ func main() {
 	log.SetFormatter(&log.JSONFormatter{})
 
 	log.SetFormatter(&log.JSONFormatter{})
-	if len(viper.GetString("Record.Name")) == 0 {
-		log.Fatal("Record name not provided")
-	}
 
 	res, err := http.Get("https://api.ipify.org")
 	if err != nil {
@@ -54,105 +69,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	CFAPIKey := viper.GetString("CF.APIKey")
-	CFAPIEmail := viper.GetString("CF.APIEmail")
+	var wg sync.WaitGroup
 
-	api, err := cloudflare.New(CFAPIKey, CFAPIEmail)
-	if err != nil {
-		log.Fatal(err)
+	cf.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"))
+
+	records := viper.GetStringMap("records")
+
+	for recordName, item := range records {
+		wg.Add(1)
+		go runDNSUpdate(&wg, string(ip), recordName, item)
 	}
 
-	zoneID, err := api.ZoneIDByName(viper.GetString("ZoneName"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	vpnRecord := cloudflare.DNSRecord{
-		Name: viper.GetString("Record.Name"),
-	}
-
-	records, err := api.DNSRecords(zoneID, vpnRecord)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(records) == 0 {
-		vpnRecord.Type = viper.GetString("Record.Type")
-		vpnRecord.Proxied = viper.GetBool("Record.Proxied")
-		vpnRecord.TTL = viper.GetInt("Record.TTL")
-		vpnRecord.Content = string(ip)
-		record, err := api.CreateDNSRecord(zoneID, vpnRecord)
-		if err != nil {
-			log.WithFields(
-				log.Fields{
-					"Name":       record.Result.Name,
-					"Content":    record.Result.Content,
-					"Proxiable":  record.Result.Proxiable,
-					"TTL":        record.Result.TTL,
-					"CreatedOn":  record.Result.CreatedOn,
-					"ModifiedOn": record.Result.ModifiedOn,
-					"Created":    false,
-					"Updated":    false,
-				},
-			).Fatal(err)
-		}
-		log.WithFields(
-			log.Fields{
-				"Name":       record.Result.Name,
-				"Content":    record.Result.Content,
-				"Proxiable":  record.Result.Proxiable,
-				"TTL":        record.Result.TTL,
-				"CreatedOn":  record.Result.CreatedOn,
-				"ModifiedOn": record.Result.ModifiedOn,
-				"Created":    true,
-				"Updated":    false,
-			},
-		).Info("Record created")
-	} else {
-		for _, record := range records {
-			if string(ip) != record.Content {
-				record.Content = string(ip)
-				err := api.UpdateDNSRecord(zoneID, record.ID, record)
-				if err != nil {
-					log.WithFields(
-						log.Fields{
-							"Name":       record.Name,
-							"Content":    record.Content,
-							"Proxiable":  record.Proxiable,
-							"TTL":        record.TTL,
-							"CreatedOn":  record.CreatedOn,
-							"ModifiedOn": record.ModifiedOn,
-							"Created":    false,
-							"Updated":    false,
-						},
-					).Fatal(err)
-				}
-				log.WithFields(
-					log.Fields{
-						"Name":       record.Name,
-						"Content":    record.Content,
-						"Proxiable":  record.Proxiable,
-						"TTL":        record.TTL,
-						"CreatedOn":  record.CreatedOn,
-						"ModifiedOn": record.ModifiedOn,
-						"Created":    false,
-						"Updated":    true,
-					},
-				).Info("Record updated")
-			} else {
-				log.WithFields(
-					log.Fields{
-						"Name":       record.Name,
-						"Content":    record.Content,
-						"Proxiable":  record.Proxiable,
-						"TTL":        record.TTL,
-						"CreatedOn":  record.CreatedOn,
-						"ModifiedOn": record.ModifiedOn,
-						"Created":    false,
-						"Updated":    false,
-					},
-				).Info("Record not updated")
-			}
-		}
-	}
+	wg.Wait()
 }
