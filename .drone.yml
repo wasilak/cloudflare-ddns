@@ -24,7 +24,7 @@ steps:
       GOOS: darwin
       GOARCH: amd64
     commands:
-      - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM}
+      - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}
 
   - name: linux armv7
     image: golang:latest
