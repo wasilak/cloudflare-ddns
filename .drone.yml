@@ -18,6 +18,14 @@ steps:
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}
 
+  - name: osx amd64
+    image: golang:latest
+    environment:
+      GOOS: darwin
+      GOARCH: amd64
+    commands:
+      - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM}
+
   - name: linux armv7
     image: golang:latest
     environment:
@@ -56,6 +64,7 @@ steps:
     when:
       event: tag
     depends_on:
+      - osx amd64
       - linux amd64
       - linux armv7
       - linux arm64
