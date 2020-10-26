@@ -1,13 +1,20 @@
 
-n.n.n / 2020-10-21
+n.n.n / 2020-10-26
 ==================
 
+  * bumped version to 0.0.14
+  * fixed drone build
 
+0.0.14 / 2020-10-25
+===================
+
+  * fixed drone build
+  * refactoring: - goroutines new features: - multiple dns records, - record types (A, CNAME, etc.) fixed - record updates - logs
 
 0.0.13 / 2020-10-21
 ===================
 
-  * fixed gitea release
+  * fixed changelog
   * arm64 build
 
 0.0.12 / 2020-09-11

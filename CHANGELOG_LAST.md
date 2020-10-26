@@ -1,2 +1,2 @@
-  * fixed gitea release
+  * fixed changelog
   * arm64 build
