@@ -23,12 +23,6 @@ func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
 	record.Proxied = proxied
 	record.TTL = item.(map[string]interface{})["ttl"].(int)
 
-	if nil != item.(map[string]interface{})["content"] {
-		record.Content = item.(map[string]interface{})["content"].(string)
-	} else {
-		record.Content = string(ip)
-	}
-
 	zoneName := item.(map[string]interface{})["zonename"].(string)
 	cf.RunDNSUpdate(string(ip), zoneName, record)
 	wg.Done()

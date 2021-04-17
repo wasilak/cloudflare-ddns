@@ -96,6 +96,8 @@ func RunDNSUpdate(ip, zoneName string, record cloudflare.DNSRecord) {
 
 	records := GetDNSRecords(zoneID, record)
 
+	record.Content = string(ip)
+
 	if len(records) == 0 {
 		createDNSRecord(zoneID, record)
 	} else {
