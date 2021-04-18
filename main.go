@@ -32,15 +32,15 @@ func main() {
 
 	godotenv.Load()
 
-	viper.SetConfigName("config")                 // name of config file (without extension)
-	viper.SetConfigType("yaml")                   // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath(".")                      // optionally look for config in the working directory
-	viper.AddConfigPath("$HOME/.cloudflare-ddns") // call multiple times to add many search paths
-	viper.AddConfigPath("/etc/cloudflare-ddns/")  // path to look for the config file in
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("$HOME/.cloudflare-ddns")
+	viper.AddConfigPath("/etc/cloudflare-ddns/")
 	viper.BindEnv("CF.APIKey", "CF_API_KEY")
 	viper.BindEnv("CF.APIEmail", "CF_API_EMAIL")
-	viperErr := viper.ReadInConfig() // Find and read the config file
-	if viperErr != nil {             // Handle errors reading the config file
+	viperErr := viper.ReadInConfig()
+	if viperErr != nil {
 		log.Fatal(viperErr)
 	}
 
