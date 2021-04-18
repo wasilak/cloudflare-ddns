@@ -1,12 +1,30 @@
 
-n.n.n / 2020-10-26
+n.n.n / 2021-04-18
 ==================
 
+
+
+0.0.15 / 2021-04-18
+===================
+
+  * drone adjustments
+  * switched drone gitea to internal consul domain
+  * switched to quay.io drone builder
+  * testing with new line
+  * testing with new line
+  * removed comments
+  * fixed bug creating new records instead of updating
+  * fixed drone build
+
+0.0.14 / 2020-10-26
+===================
+
+  * bumped version to 0.0.14
   * bumped version to 0.0.14
   * fixed drone build
 
-0.0.14 / 2020-10-25
-===================
+test / 2020-10-25
+=================
 
   * fixed drone build
   * refactoring: - goroutines new features: - multiple dns records, - record types (A, CNAME, etc.) fixed - record updates - logs
