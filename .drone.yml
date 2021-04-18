@@ -48,7 +48,7 @@ steps:
     settings:
       api_key:
         from_secret: gitea_token
-      base_url: https://git.wasil.org
+      base_url: http://git.service.consul
       files:
         - /drone/src/dist/*
       title: 0.0.14
