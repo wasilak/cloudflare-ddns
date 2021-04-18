@@ -32,6 +32,7 @@ func main() {
 
 	godotenv.Load()
 
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
