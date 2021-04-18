@@ -12,6 +12,7 @@ platform:
 steps:
   - name: linux amd64
     image: quay.io/wasilak/golang:1.16-alpine
+    pull: if-not-exists
     environment:
       GOOS: linux
       GOARCH: amd64
@@ -20,6 +21,7 @@ steps:
 
   - name: osx amd64
     image: quay.io/wasilak/golang:1.16-alpine
+    pull: if-not-exists
     environment:
       GOOS: darwin
       GOARCH: amd64
@@ -28,6 +30,7 @@ steps:
 
   - name: linux armv7
     image: quay.io/wasilak/golang:1.16-alpine
+    pull: if-not-exists
     environment:
       GOOS: linux
       GOARCH: arm
@@ -37,6 +40,7 @@ steps:
 
   - name: linux arm64
     image: quay.io/wasilak/golang:1.16-alpine
+    pull: if-not-exists
     environment:
       GOOS: linux
       GOARCH: arm64
