@@ -11,7 +11,7 @@ platform:
 
 steps:
   - name: linux amd64
-    image: golang:latest
+    image: quay.io/wasilak/golang:1.16-alpine
     environment:
       GOOS: linux
       GOARCH: amd64
@@ -19,7 +19,7 @@ steps:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}
 
   - name: osx amd64
-    image: golang:latest
+    image: quay.io/wasilak/golang:1.16-alpine
     environment:
       GOOS: darwin
       GOARCH: amd64
@@ -27,16 +27,16 @@ steps:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}
 
   - name: linux armv7
-    image: golang:latest
+    image: quay.io/wasilak/golang:1.16-alpine
     environment:
       GOOS: linux
       GOARCH: arm
       GOARM: 7
     commands:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM}
-  
+
   - name: linux arm64
-    image: golang:latest
+    image: quay.io/wasilak/golang:1.16-alpine
     environment:
       GOOS: linux
       GOARCH: arm64
@@ -47,7 +47,7 @@ steps:
     image: plugins/gitea-release
     settings:
       api_key:
-         from_secret: gitea_token
+        from_secret: gitea_token
       base_url: https://git.wasil.org
       files:
         - /drone/src/dist/*
