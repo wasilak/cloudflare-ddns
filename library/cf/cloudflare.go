@@ -1,6 +1,7 @@
 package cf
 
 import (
+	"context"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/cloudflare/cloudflare-go"
@@ -8,9 +9,11 @@ import (
 
 var api *cloudflare.API
 var err error
+var ctx context.Context
 
 // Init func
-func Init(CFAPIKey, CFAPIEmail string) {
+func Init(CFAPIKey, CFAPIEmail string, CFctx context.Context) {
+	ctx = CFctx
 	api, err = cloudflare.New(CFAPIKey, CFAPIEmail)
 	if err != nil {
 		log.Fatal(err)
@@ -38,7 +41,7 @@ func GetDNSRecord(recordName string) cloudflare.DNSRecord {
 
 // GetDNSRecords func
 func GetDNSRecords(zoneID string, record cloudflare.DNSRecord) []cloudflare.DNSRecord {
-	records, err := api.DNSRecords(zoneID, record)
+	records, err := api.DNSRecords(ctx, zoneID, record)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,7 +51,7 @@ func GetDNSRecords(zoneID string, record cloudflare.DNSRecord) []cloudflare.DNSR
 
 func createDNSRecord(zoneID string, record cloudflare.DNSRecord) {
 	record.Proxiable = true
-	newRecord, err := api.CreateDNSRecord(zoneID, record)
+	newRecord, err := api.CreateDNSRecord(ctx, zoneID, record)
 
 	logFields := log.Fields{
 		"Name":       newRecord.Result.Name,
@@ -81,7 +84,7 @@ func updateDNSRecord(zoneID, recordID string, record cloudflare.DNSRecord, updat
 		"Created":    false,
 	}
 
-	err := api.UpdateDNSRecord(zoneID, record.ID, record)
+	err := api.UpdateDNSRecord(ctx, zoneID, record.ID, record)
 	if err != nil {
 		log.WithFields(logFields).Fatal(err)
 	}

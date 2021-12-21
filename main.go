@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -20,7 +21,7 @@ func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
 
 	record := cf.GetDNSRecord(recordName)
 	record.Type = item.(map[string]interface{})["type"].(string)
-	record.Proxied = proxied
+	record.Proxied = &proxied
 	record.TTL = item.(map[string]interface{})["ttl"].(int)
 
 	zoneName := item.(map[string]interface{})["zonename"].(string)
@@ -29,6 +30,9 @@ func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
 }
 
 func main() {
+
+	// Most API calls require a Context
+	ctx := context.Background()
 
 	godotenv.Load()
 
@@ -65,7 +69,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	cf.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"))
+	cf.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"), ctx)
 
 	records := viper.GetStringMap("records")
 
