@@ -1,4 +1,4 @@
-package notif
+package libs
 
 import (
 	"bytes"

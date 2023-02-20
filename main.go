@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/wasilak/cloudflare-ddns/cmd"
-	// "github.com/wasilak/cloudflare-ddns/library/cf"
+	// "github.com/wasilak/cloudflare-ddns/libs"
 )
 
 // func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
@@ -21,18 +21,6 @@ import (
 func main() {
 
 	cmd.Execute()
-
-	// Most API calls require a Context
-	// ctx := context.Background()
-
-	// viper.SetDefault("LogFile", "/var/log/cloudflare-dns.log")
-
-	// file, err := os.OpenFile(k.String("LogFile"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	// mw := io.MultiWriter(os.Stdout, file)
-	// logrus.SetOutput(mw)
-	// log.SetFormatter(&log.JSONFormatter{})
-
-	// log.SetFormatter(&log.JSONFormatter{})
 
 	// res, err := http.Get("https://api.ipify.org")
 	// if err != nil {

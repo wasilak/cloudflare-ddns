@@ -1,12 +1,16 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"io"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/exp/slog"
 )
 
 var (
@@ -16,9 +20,11 @@ var (
 		Short: "Cloudflare dynamic DNS",
 		// Version: version,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("%+v\n", viper.AllSettings())
+			logger := cmd.Context().Value("logger").(*slog.Logger)
+			logger.Debug(fmt.Sprintf("%+v", viper.AllSettings()))
 		},
 	}
+	ctx = context.Background()
 )
 
 func Execute() {
@@ -29,15 +35,13 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initLogging, setContext)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cloudflare-ddns/config.yml)")
 	// viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
 	// viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
 	// viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
 	// viper.SetDefault("license", "apache")
-
-	// rootCmd.SetVersionTemplate("dsadas")
 
 	rootCmd.AddCommand(versionCmd)
 }
@@ -60,7 +64,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".config" (without extension).
 		viper.SetConfigType("yaml")
-		viper.SetConfigName("confsig")
+		viper.SetConfigName("config")
 		// viper.AddConfigPath(".")
 		viper.AddConfigPath(home)
 	}
@@ -69,5 +73,29 @@ func initConfig() {
 
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		log.Printf("%+v\n", err)
 	}
+}
+
+func initLogging() {
+	opts := slog.HandlerOptions{
+		Level:     slog.LevelDebug,
+		AddSource: true,
+	}
+
+	file, err := os.OpenFile(viper.GetString("LogFile"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	mw := io.MultiWriter(os.Stdout, file)
+
+	textHandler := opts.NewTextHandler(mw)
+	logger := slog.New(textHandler)
+
+	ctx = context.WithValue(ctx, "logger", logger)
+}
+
+func setContext() {
+	rootCmd.SetContext(ctx)
 }
