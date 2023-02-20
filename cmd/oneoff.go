@@ -2,10 +2,9 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/slog"
+	"github.com/wasilak/cloudflare-ddns/libs"
 )
 
 var oneoffCmd = &cobra.Command{
@@ -23,7 +22,12 @@ var oneoffCmd = &cobra.Command{
 }
 
 func oneoffFunc(ctx context.Context) error {
-	logger := ctx.Value("logger").(*slog.Logger)
-	logger.Debug(fmt.Sprintf("oneoff!!"))
+	ip, err := libs.GetIP()
+	if err != nil {
+		return err
+	}
+
+	libs.Runner(ctx, ip)
+
 	return nil
 }

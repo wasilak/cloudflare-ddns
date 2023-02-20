@@ -5,27 +5,9 @@ import (
 	// "github.com/wasilak/cloudflare-ddns/libs"
 )
 
-// func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
-// 	proxied := item.(map[string]interface{})["proxied"].(bool)
-
-// 	record := cf.GetDNSRecord(recordName)
-// 	record.Type = item.(map[string]interface{})["type"].(string)
-// 	record.Proxied = &proxied
-// 	record.TTL = item.(map[string]interface{})["ttl"].(int)
-
-// 	zoneName := item.(map[string]interface{})["zonename"].(string)
-// 	cf.RunDNSUpdate(string(ip), zoneName, record)
-// 	wg.Done()
-// }
-
 func main() {
 
 	cmd.Execute()
-
-	// res, err := http.Get("https://api.ipify.org")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	// if k.Bool("mail.enabled") {
 
@@ -50,11 +32,6 @@ func main() {
 	// 	}
 
 	// 	log.Printf("Email sent to: %v", k.StringSlice("mail.to"))
-	// }
-
-	// ip, err := ioutil.ReadAll(res.Body)
-	// if err != nil {
-	// 	log.Fatal(err)
 	// }
 
 	// var wg sync.WaitGroup
