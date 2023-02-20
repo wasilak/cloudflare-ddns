@@ -33,17 +33,4 @@ func main() {
 
 	// 	log.Printf("Email sent to: %v", k.StringSlice("mail.to"))
 	// }
-
-	// var wg sync.WaitGroup
-
-	// cf.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"), ctx)
-
-	// records := viper.GetStringMap("records")
-
-	// for recordName, item := range records {
-	// 	wg.Add(1)
-	// 	go runDNSUpdate(&wg, string(ip), recordName, item)
-	// }
-
-	// wg.Wait()
 }
