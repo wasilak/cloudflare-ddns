@@ -12,6 +12,9 @@ var version string
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of cloudflare-ddns",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		cmd.SetContext(ctx)
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if err := versionFunc(); err != nil {
 			return err

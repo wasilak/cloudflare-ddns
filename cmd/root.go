@@ -19,6 +19,9 @@ var (
 		Use:   "cloudflare-ddns",
 		Short: "Cloudflare dynamic DNS",
 		// Version: version,
+		PreRun: func(cmd *cobra.Command, args []string) {
+			cmd.SetContext(ctx)
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			logger := cmd.Context().Value("logger").(*slog.Logger)
 			logger.Debug(fmt.Sprintf("%+v", viper.AllSettings()))
@@ -35,7 +38,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initLogging, setContext)
+	cobra.OnInitialize(initConfig, initLogging)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cloudflare-ddns/config.yml)")
 	// viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
@@ -44,6 +47,7 @@ func init() {
 	// viper.SetDefault("license", "apache")
 
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(oneoffCmd)
 }
 
 func initConfig() {
@@ -94,8 +98,4 @@ func initLogging() {
 	logger := slog.New(textHandler)
 
 	ctx = context.WithValue(ctx, "logger", logger)
-}
-
-func setContext() {
-	rootCmd.SetContext(ctx)
 }
