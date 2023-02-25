@@ -58,6 +58,7 @@ func initConfig() {
 	viper.BindEnv("CF.APIEmail", "CF_API_EMAIL")
 
 	viper.SetDefault("LogFile", "/var/log/cloudflare-dns.log")
+	viper.SetDefault("dnsRefreshTime", "60s")
 
 	if cfgFile != "" {
 		// Use config file from the flag.

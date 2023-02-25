@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"context"
-	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -27,7 +29,6 @@ var daemonCmd = &cobra.Command{
 
 func daemonFunc(ctx context.Context) error {
 	logger := ctx.Value("logger").(*slog.Logger)
-	logger.Debug("daemonFunc")
 
 	ip, err := libs.GetIP()
 	if err != nil {
@@ -39,19 +40,43 @@ func daemonFunc(ctx context.Context) error {
 		panic(err)
 	}
 
-	ticker := time.NewTicker(dnsRefreshTime)
-	logger.Debug(fmt.Sprintf("%+v", dnsRefreshTime))
+	ctx, cancel := context.WithCancel(ctx)
+
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGHUP)
+
+	defer func() {
+		signal.Stop(signalChan)
+		cancel()
+	}()
 
 	go func() {
+		for {
+			select {
+			case s := <-signalChan:
+				switch s {
+				case syscall.SIGHUP:
+					logger.Debug("Reloading config...")
+				case os.Interrupt:
+					logger.Debug("Stopping...")
+					cancel()
+					os.Exit(1)
+				}
+			case <-ctx.Done():
+				logger.Debug("Done.")
+				os.Exit(1)
+			}
+		}
+	}()
 
-		for range ticker.C {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-time.Tick(dnsRefreshTime):
 			logger.Debug("Starting DNS refresh...")
 			libs.Runner(ctx, ip)
 			logger.Debug("DNS refresh completed.")
 		}
-	}()
-
-	defer ticker.Stop()
-
-	return nil
+	}
 }
