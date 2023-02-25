@@ -48,6 +48,7 @@ func init() {
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(oneoffCmd)
+	rootCmd.AddCommand(daemonCmd)
 }
 
 func initConfig() {

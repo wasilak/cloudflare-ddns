@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/wasilak/cloudflare-ddns/cmd"
-	// "github.com/wasilak/cloudflare-ddns/libs"
+//	 "github.com/wasilak/cloudflare-ddns/libs"
 )
 
 func main() {
