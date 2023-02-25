@@ -23,6 +23,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // direct
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/soheilhy/cmux v0.1.4 // indirect
+	github.com/spf13/afero v1.9.4 // indirect
 	github.com/spf13/viper v1.15.0
 	github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5 // indirect
 	github.com/urfave/cli v1.22.4 // indirect
