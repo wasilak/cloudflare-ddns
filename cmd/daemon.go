@@ -2,8 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -55,9 +53,9 @@ func daemonFunc(ctx context.Context) error {
 				case syscall.SIGHUP:
 					logger.Debug("Reloading config...")
 					if err := viper.ReadInConfig(); err == nil {
-						fmt.Println("Using config file:", viper.ConfigFileUsed())
+						logger.Debug("Using config file:", viper.ConfigFileUsed())
 					} else {
-						log.Printf("%+v\n", err)
+						logger.Error("Error", err)
 					}
 				case os.Interrupt:
 					logger.Debug("Stopping...")

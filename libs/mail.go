@@ -96,7 +96,7 @@ func Notify(ctx context.Context, ip string) error {
 			return err
 		}
 
-		logger.Debug("Email sent to:", viper.GetStringSlice("mail.to"))
+		logger.Debug("Email sent to", viper.GetStringSlice("mail.to"))
 	}
 
 	return nil

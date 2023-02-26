@@ -2,7 +2,6 @@ package cf
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	cloudflare "github.com/cloudflare/cloudflare-go"
@@ -70,10 +69,9 @@ func createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.CreateD
 
 func updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.UpdateDNSRecordParams) {
 
-	fmt.Printf("%+v\n", params)
 	err := api.UpdateDNSRecord(ctx, rc, params)
 	if err != nil {
-		fmt.Printf("UpdateDNSRecord error: %+v\n", err)
+		logger.Debug("UpdateDNSRecord error", err)
 	}
 
 	logger.Info("Record updated",
