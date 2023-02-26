@@ -3,6 +3,7 @@ package libs
 import (
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
 	"html/template"
 	"log"
@@ -11,6 +12,9 @@ import (
 	"golang.org/x/exp/slog"
 	gomail "gopkg.in/mail.v2"
 )
+
+//go:embed templates
+var templateFiles embed.FS
 
 type MailData struct {
 	IP string
@@ -54,12 +58,10 @@ func (m *Mail) Send(dryRun bool) (bool, error) {
 }
 
 func (m *Mail) parseTemplate(templateFileName string, data interface{}) error {
-	t, err := template.ParseFiles(templateFileName)
-	if err != nil {
-		return err
-	}
+	t := template.Must(template.ParseFS(templateFiles, "templates/*"))
+
 	buf := new(bytes.Buffer)
-	if err = t.Execute(buf, data); err != nil {
+	if err := t.Execute(buf, data); err != nil {
 		return err
 	}
 	m.Body = buf.String()
@@ -94,8 +96,7 @@ func Notify(ctx context.Context, ip string) error {
 			return err
 		}
 
-		logger.Debug("Email sent to: %v", viper.GetStringSlice("mail.to"))
-
+		logger.Debug("Email sent to:", viper.GetStringSlice("mail.to"))
 	}
 
 	return nil
