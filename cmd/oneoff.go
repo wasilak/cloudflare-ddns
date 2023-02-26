@@ -22,12 +22,9 @@ var oneoffCmd = &cobra.Command{
 }
 
 func oneoffFunc(ctx context.Context) error {
-	ip, err := libs.GetIP()
+	_, err := libs.Runner(ctx)
 	if err != nil {
 		return err
 	}
-
-	libs.Runner(ctx, ip)
-
 	return nil
 }

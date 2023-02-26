@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,11 +32,6 @@ var daemonCmd = &cobra.Command{
 func daemonFunc(ctx context.Context) error {
 	logger := ctx.Value("logger").(*slog.Logger)
 
-	ip, err := libs.GetIP()
-	if err != nil {
-		return err
-	}
-
 	dnsRefreshTime, err := time.ParseDuration(viper.GetString("dnsRefreshTime"))
 	if err != nil {
 		panic(err)
@@ -57,6 +54,11 @@ func daemonFunc(ctx context.Context) error {
 				switch s {
 				case syscall.SIGHUP:
 					logger.Debug("Reloading config...")
+					if err := viper.ReadInConfig(); err == nil {
+						fmt.Println("Using config file:", viper.ConfigFileUsed())
+					} else {
+						log.Printf("%+v\n", err)
+					}
 				case os.Interrupt:
 					logger.Debug("Stopping...")
 					cancel()
@@ -69,13 +71,24 @@ func daemonFunc(ctx context.Context) error {
 		}
 	}()
 
+	currentIp := ""
+
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(dnsRefreshTime):
 			logger.Debug("Starting DNS refresh...")
-			libs.Runner(ctx, ip)
+			ip, err := libs.Runner(ctx)
+			if err != nil {
+				logger.Error("Error", err)
+			}
+
+			if currentIp != ip {
+				currentIp = ip
+				libs.Notify(ctx, ip)
+			}
+
 			logger.Debug("DNS refresh completed.")
 		}
 	}

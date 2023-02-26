@@ -26,8 +26,13 @@ func GetIP() (string, error) {
 	return string(ip), nil
 }
 
-func Runner(ctx context.Context, ip string) {
+func Runner(ctx context.Context) (string, error) {
 	var wg sync.WaitGroup
+
+	ip, err := GetIP()
+	if err != nil {
+		return "", err
+	}
 
 	cf.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"), ctx)
 
@@ -39,6 +44,8 @@ func Runner(ctx context.Context, ip string) {
 	}
 
 	wg.Wait()
+
+	return ip, nil
 }
 
 func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {

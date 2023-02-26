@@ -41,10 +41,6 @@ func init() {
 	cobra.OnInitialize(initConfig, initLogging)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cloudflare-ddns/config.yml)")
-	// viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	// viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-	// viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
-	// viper.SetDefault("license", "apache")
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(oneoffCmd)
@@ -59,6 +55,7 @@ func initConfig() {
 
 	viper.SetDefault("LogFile", "/var/log/cloudflare-dns.log")
 	viper.SetDefault("dnsRefreshTime", "60s")
+	viper.SetDefault("mail.subject", "Your External IP has changed!")
 
 	if cfgFile != "" {
 		// Use config file from the flag.
@@ -71,7 +68,6 @@ func initConfig() {
 		// Search config in home directory with name ".config" (without extension).
 		viper.SetConfigType("yaml")
 		viper.SetConfigName("config")
-		// viper.AddConfigPath(".")
 		viper.AddConfigPath(home)
 	}
 

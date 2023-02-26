@@ -8,6 +8,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
 	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
+	gopkg.in/mail.v2 v2.3.1
 )
 
 require (
@@ -30,6 +31,7 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
