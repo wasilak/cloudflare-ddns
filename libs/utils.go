@@ -2,7 +2,9 @@ package libs
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"sync"
 
@@ -23,7 +25,13 @@ func GetIP() (string, error) {
 		return "", err
 	}
 
-	return string(ip), nil
+	ipAddr := string(ip)
+
+	if net.ParseIP(ipAddr) != nil {
+		return ipAddr, nil
+	}
+
+	return "", fmt.Errorf("%s is not an IP address", ipAddr)
 }
 
 func Runner(ctx context.Context) (string, error) {
