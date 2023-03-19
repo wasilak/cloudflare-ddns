@@ -80,9 +80,7 @@ func daemonFunc(ctx context.Context) error {
 			ip, err := libs.Runner(ctx)
 			if err != nil {
 				logger.Error("Error", err)
-			}
-
-			if ip != "" && currentIp != ip {
+			} else if ip != "" && currentIp != ip {
 				currentIp = ip
 				libs.Notify(ctx, ip)
 			}
