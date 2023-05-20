@@ -13,6 +13,7 @@ import (
 	"github.com/wasilak/cloudflare-ddns/libs/cf"
 )
 
+// The function retrieves the public IP address of the device it is running on.
 func GetIP() (string, error) {
 	res, err := http.Get("https://api.ipify.org")
 
@@ -34,6 +35,7 @@ func GetIP() (string, error) {
 	return "", fmt.Errorf("%s is not an IP address", ipAddr)
 }
 
+// The Runner function updates DNS records for a given IP address using Cloudflare API.
 func Runner(ctx context.Context) (string, error) {
 	var wg sync.WaitGroup
 
@@ -56,6 +58,7 @@ func Runner(ctx context.Context) (string, error) {
 	return ip, nil
 }
 
+// This function updates a DNS record with a given IP address and record name using the Cloudflare API.
 func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
 	proxied := item.(map[string]interface{})["proxied"].(bool)
 

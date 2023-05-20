@@ -15,7 +15,7 @@ var (
 	logger *slog.Logger
 )
 
-// Init func
+// The function initializes a Cloudflare API client with the provided API key, email, and context.
 func Init(CFAPIKey, CFAPIEmail string, CFctx context.Context) {
 	ctx = CFctx
 
@@ -28,6 +28,7 @@ func Init(CFAPIKey, CFAPIEmail string, CFctx context.Context) {
 	}
 }
 
+// The function takes a zone name as input and returns its corresponding zone ID using an API call.
 func GetZoneID(zoneName string) string {
 	zoneID, err := api.ZoneIDByName(zoneName)
 	if err != nil {
@@ -37,6 +38,7 @@ func GetZoneID(zoneName string) string {
 	return zoneID
 }
 
+// This function retrieves a DNS record from Cloudflare using its ID.
 func GetDNSRecord(rc *cloudflare.ResourceContainer, record cloudflare.DNSRecord) (cloudflare.DNSRecord, error) {
 
 	record, err := api.GetDNSRecord(ctx, rc, record.ID)
@@ -47,6 +49,7 @@ func GetDNSRecord(rc *cloudflare.ResourceContainer, record cloudflare.DNSRecord)
 	return record, nil
 }
 
+// The function creates a DNS record and logs its details.
 func createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.CreateDNSRecordParams) {
 
 	record, err := api.CreateDNSRecord(ctx, rc, params)
@@ -67,6 +70,7 @@ func createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.CreateD
 	)
 }
 
+// This function updates a DNS record and logs the changes.
 func updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.UpdateDNSRecordParams) {
 
 	err := api.UpdateDNSRecord(ctx, rc, params)
@@ -86,6 +90,8 @@ func updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.UpdateD
 	)
 }
 
+// The function updates a DNS record in Cloudflare by either creating a new record or updating an
+// existing one.
 func RunDNSUpdate(record cloudflare.DNSRecord) {
 	zoneID := GetZoneID(record.ZoneName)
 
