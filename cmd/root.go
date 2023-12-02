@@ -3,14 +3,14 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io"
-	"log"
 	"os"
+
+	"log/slog"
 
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/exp/slog"
+	"github.com/wasilak/loggergo"
 )
 
 // This code block is defining variables and initializing a root command for a command-line interface
@@ -25,8 +25,6 @@ var (
 			cmd.SetContext(ctx)
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			logger := cmd.Context().Value("logger").(*slog.Logger)
-			logger.Debug(fmt.Sprintf("%+v", viper.AllSettings()))
 		},
 	}
 	ctx = context.Background()
@@ -44,7 +42,7 @@ func Execute() {
 // up configuration and logging options, and adding commands for version information, one-off updates,
 // and running as a daemon.
 func init() {
-	cobra.OnInitialize(initConfig, initLogging)
+	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cloudflare-ddns/config.yml)")
 
@@ -61,7 +59,8 @@ func initConfig() {
 	viper.BindEnv("CF.APIKey", "CF_API_KEY")
 	viper.BindEnv("CF.APIEmail", "CF_API_EMAIL")
 
-	viper.SetDefault("LogFile", "/var/log/cloudflare-dns.log")
+	viper.SetDefault("loglevel", "info")
+	viper.SetDefault("logformat", "plain")
 	viper.SetDefault("dnsRefreshTime", "60s")
 	viper.SetDefault("mail.subject", "Your External IP has changed!")
 
@@ -91,35 +90,19 @@ func initConfig() {
 	// indicating which configuration file is being used. If the configuration file could not be read, it
 	// logs the error message to the console.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		slog.DebugContext(ctx, "Using config file", "filename", viper.ConfigFileUsed())
 	} else {
-		log.Printf("%+v\n", err)
-	}
-}
-
-// The function initializes logging with a debug level and writes logs to a file and standard output.
-func initLogging() {
-	opts := slog.HandlerOptions{
-		Level:     slog.LevelDebug,
-		AddSource: true,
+		slog.ErrorContext(ctx, "error", err)
 	}
 
-	// This code block is initializing a file for logging. It uses the `os.OpenFile` function to create or
-	// open a file with the path specified in the configuration settings (`viper.GetString("LogFile")`).
-	// The `os.O_CREATE|os.O_WRONLY|os.O_APPEND` flags are used to create the file if it does not exist,
-	// open it for writing, and append to the end of the file if it already exists. The `0666` permission
-	// bits are used to set the file permissions to read and write for all users. If an error occurs while
-	// opening or creating the file, the function logs the error message and exits the program. The
-	// `io.MultiWriter` function is used to create a writer that writes to both standard output and the
-	// log file.
-	file, err := os.OpenFile(viper.GetString("LogFile"), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	loggerConfig := loggergo.LoggerGoConfig{
+		Level:  viper.GetString("loglevel"),
+		Format: viper.GetString("logformat"),
+	}
+
+	_, err := loggergo.LoggerInit(loggerConfig)
 	if err != nil {
-		log.Fatal(err)
+		slog.ErrorContext(ctx, err.Error())
+		os.Exit(1)
 	}
-	mw := io.MultiWriter(os.Stdout, file)
-
-	textHandler := opts.NewTextHandler(mw)
-	logger := slog.New(textHandler)
-
-	ctx = context.WithValue(ctx, "logger", logger)
 }

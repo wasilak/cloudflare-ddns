@@ -44,13 +44,19 @@ func Runner(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	cf.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"), ctx)
+	cfAPI := cf.CF{}
 
-	records := viper.GetStringMap("records")
+	cfAPI.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"), ctx)
 
-	for recordName, item := range records {
+	var records map[string]cloudflare.DNSRecord
+
+	viper.UnmarshalKey("records", &records)
+
+	for recordName, record := range records {
 		wg.Add(1)
-		go runDNSUpdate(&wg, ip, recordName, item)
+		record.Name = recordName
+		record.Content = ip
+		go runDNSUpdate(&wg, &cfAPI, record)
 	}
 
 	wg.Wait()
@@ -59,19 +65,7 @@ func Runner(ctx context.Context) (string, error) {
 }
 
 // This function updates a DNS record with a given IP address and record name using the Cloudflare API.
-func runDNSUpdate(wg *sync.WaitGroup, ip, recordName string, item interface{}) {
-	proxied := item.(map[string]interface{})["proxied"].(bool)
-
-	record := cloudflare.DNSRecord{
-		Name:      recordName,
-		Type:      item.(map[string]interface{})["type"].(string),
-		TTL:       item.(map[string]interface{})["ttl"].(int),
-		Proxiable: true,
-		Proxied:   &proxied,
-		Content:   ip,
-		ZoneName:  item.(map[string]interface{})["zonename"].(string),
-	}
-
-	cf.RunDNSUpdate(record)
+func runDNSUpdate(wg *sync.WaitGroup, cfAPI *cf.CF, record cloudflare.DNSRecord) {
+	cfAPI.RunDNSUpdate(record)
 	wg.Done()
 }

@@ -7,10 +7,11 @@ import (
 	"syscall"
 	"time"
 
+	"log/slog"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/wasilak/cloudflare-ddns/libs"
-	"golang.org/x/exp/slog"
 )
 
 // This code defines a Cobra command called `daemon` with a `Use` string of "daemon" and a `Short`
@@ -35,7 +36,6 @@ var daemonCmd = &cobra.Command{
 // This function runs a daemon that periodically refreshes DNS and notifies if the IP address has
 // changed.
 func daemonFunc(ctx context.Context) error {
-	logger := ctx.Value("logger").(*slog.Logger)
 
 	// This code is parsing the value of the `dnsRefreshTime` configuration parameter from the Viper
 	// configuration object as a duration using the `time.ParseDuration` function. If there is an error
@@ -45,6 +45,8 @@ func daemonFunc(ctx context.Context) error {
 	if err != nil {
 		panic(err)
 	}
+
+	slog.DebugContext(ctx, "Refresh Time", "dnsRefreshTime", dnsRefreshTime)
 
 	ctx, cancel := context.WithCancel(ctx)
 
@@ -76,49 +78,47 @@ func daemonFunc(ctx context.Context) error {
 			case s := <-signalChan:
 				switch s {
 				case syscall.SIGHUP:
-					logger.Debug("Reloading config...")
+					slog.DebugContext(ctx, "Reloading config...")
 					if err := viper.ReadInConfig(); err == nil {
-						logger.Debug("Using config file:", viper.ConfigFileUsed())
+						slog.DebugContext(ctx, "Using config file", "filename", viper.ConfigFileUsed())
 					} else {
-						logger.Error("Error", err)
+						slog.ErrorContext(ctx, "Error", err)
 					}
 				case os.Interrupt:
-					logger.Debug("Stopping...")
+					slog.DebugContext(ctx, "Stopping...")
 					cancel()
 					os.Exit(1)
 				}
 			case <-ctx.Done():
-				logger.Debug("Done.")
+				slog.DebugContext(ctx, "Done.")
 				os.Exit(1)
 			}
 		}
 	}()
 
-	currentIp := ""
+	currentIp := runRunner("")
 
-	// This is the main loop of the `daemonFunc` function. It runs indefinitely and periodically refreshes
-	// the DNS and notifies if the IP address has changed. It uses a `select` statement to wait for either
-	// the context to be cancelled or for a timer to expire. If the context is cancelled, the function
-	// returns `nil` and the loop is exited. If the timer expires, the function calls the `libs.Runner`
-	// function to refresh the DNS and checks if the IP address has changed. If the IP address has
-	// changed, it calls the `libs.Notify` function to notify that the IP address has changed. The
-	// function then logs a message indicating that the DNS refresh is completed and waits for the timer
-	// to expire again.
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(dnsRefreshTime):
-			logger.Debug("Starting DNS refresh...")
-			ip, err := libs.Runner(ctx)
-			if err != nil {
-				logger.Error("Error", err)
-			} else if ip != "" && currentIp != ip {
-				currentIp = ip
-				libs.Notify(ctx, ip)
-			}
-
-			logger.Debug("DNS refresh completed.")
+			runRunner(currentIp)
 		}
 	}
+}
+
+func runRunner(currentIp string) string {
+	slog.DebugContext(ctx, "Starting DNS refresh...")
+	ip, err := libs.Runner(ctx)
+	if err != nil {
+		slog.ErrorContext(ctx, "Error", err)
+	} else if ip != "" && currentIp != ip {
+		currentIp = ip
+		libs.Notify(ctx, ip)
+	}
+
+	slog.DebugContext(ctx, "DNS refresh completed.")
+
+	return currentIp
 }

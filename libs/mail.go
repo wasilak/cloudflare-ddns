@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"embed"
-	"fmt"
 	"html/template"
 	"log"
 
+	"log/slog"
+
 	"github.com/spf13/viper"
-	"golang.org/x/exp/slog"
 	gomail "gopkg.in/mail.v2"
 )
 
@@ -114,9 +114,6 @@ func (m *Mail) parseTemplate(templateFileName string, data interface{}) error {
 func Notify(ctx context.Context, ip string) error {
 	if viper.GetBool("mail.enabled") {
 
-		logger := ctx.Value("logger").(*slog.Logger)
-		logger.Debug(fmt.Sprintf("%+v", viper.AllSettings()))
-
 		mailData := MailData{
 			IP: ip,
 		}
@@ -147,7 +144,7 @@ func Notify(ctx context.Context, ip string) error {
 			return err
 		}
 
-		logger.Debug("Email sent to", viper.GetStringSlice("mail.to"))
+		slog.DebugContext(ctx, "Email sent", "to", viper.GetStringSlice("mail.to"))
 	}
 
 	return nil
