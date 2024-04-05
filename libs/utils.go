@@ -35,8 +35,14 @@ func GetIP() (string, error) {
 	return "", fmt.Errorf("%s is not an IP address", ipAddr)
 }
 
+func PrepareRecordsFromConfig() []cloudflare.DNSRecord {
+	var records []cloudflare.DNSRecord
+	viper.UnmarshalKey("records", &records)
+	return records
+}
+
 // The Runner function updates DNS records for a given IP address using Cloudflare API.
-func Runner(ctx context.Context) (string, error) {
+func Runner(ctx context.Context, records []cloudflare.DNSRecord) (string, error) {
 	var wg sync.WaitGroup
 
 	ip, err := GetIP()
@@ -48,13 +54,8 @@ func Runner(ctx context.Context) (string, error) {
 
 	cfAPI.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"), ctx)
 
-	var records map[string]cloudflare.DNSRecord
-
-	viper.UnmarshalKey("records", &records)
-
-	for recordName, record := range records {
+	for _, record := range records {
 		wg.Add(1)
-		record.Name = recordName
 		record.Content = ip
 		go runDNSUpdate(&wg, &cfAPI, record)
 	}

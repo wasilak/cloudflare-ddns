@@ -98,7 +98,7 @@ func (m *Mail) Send(dryRun bool) (bool, error) {
 // file from the embedded file system and populate the `Body` field of the `Mail` struct with the
 // parsed content. It then returns an error if there is any issue during the parsing process.
 func (m *Mail) parseTemplate(templateFileName string, data interface{}) error {
-	t := template.Must(template.ParseFS(templateFiles, "templates/*"))
+	t := template.Must(template.ParseFS(templateFiles, "templates/"+templateFileName))
 
 	buf := new(bytes.Buffer)
 	if err := t.Execute(buf, data); err != nil {
