@@ -28,7 +28,7 @@ var oneoffCmd = &cobra.Command{
 
 // The function calls the Runner function from the libs package and returns any errors encountered.
 func oneoffFunc(ctx context.Context) error {
-	records := libs.PrepareRecordsFromConfig()
+	records := libs.PrepareRecords()
 	_, err := libs.Runner(ctx, records)
 	if err != nil {
 		return err

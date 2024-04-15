@@ -21,7 +21,7 @@ func (cf *CF) Init(CFAPIKey, CFAPIEmail string, ctx context.Context) {
 
 	cf.API, err = cloudflare.New(CFAPIKey, CFAPIEmail)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error(), err)
+		slog.ErrorContext(ctx, err.Error())
 		os.Exit(1)
 	}
 }
@@ -30,7 +30,7 @@ func (cf *CF) Init(CFAPIKey, CFAPIEmail string, ctx context.Context) {
 func (cf *CF) GetZoneID(zoneName string) string {
 	zoneID, err := cf.API.ZoneIDByName(zoneName)
 	if err != nil {
-		slog.ErrorContext(cf.CTX, err.Error(), err)
+		slog.ErrorContext(cf.CTX, err.Error())
 	}
 
 	return zoneID
@@ -53,7 +53,7 @@ func (cf *CF) createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflar
 	record, err := cf.API.CreateDNSRecord(cf.CTX, rc, params)
 
 	if err != nil {
-		slog.ErrorContext(cf.CTX, err.Error(), err)
+		slog.ErrorContext(cf.CTX, err.Error())
 	}
 
 	slog.InfoContext(cf.CTX, "Record created",
@@ -73,7 +73,7 @@ func (cf *CF) updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflar
 
 	record, err := cf.API.UpdateDNSRecord(cf.CTX, rc, params)
 	if err != nil {
-		slog.ErrorContext(cf.CTX, "UpdateDNSRecord error", err)
+		slog.ErrorContext(cf.CTX, "UpdateDNSRecord error")
 	}
 
 	slog.InfoContext(cf.CTX, "Record updated",
@@ -98,7 +98,7 @@ func (cf *CF) RunDNSUpdate(record cloudflare.DNSRecord) {
 	// listing records, because we might not have their IDs
 	recs, _, err := cf.API.ListDNSRecords(cf.CTX, rc, cloudflare.ListDNSRecordsParams{Name: record.Name})
 	if err != nil {
-		slog.ErrorContext(cf.CTX, err.Error(), err)
+		slog.ErrorContext(cf.CTX, err.Error())
 	}
 
 	if len(recs) == 0 {

@@ -111,7 +111,7 @@ func daemonFunc(ctx context.Context) error {
 func runRunner(currentIp string) string {
 	slog.DebugContext(ctx, "Starting DNS refresh...")
 
-	records := libs.PrepareRecordsFromConfig()
+	records := libs.PrepareRecords()
 	ip, err := libs.Runner(ctx, records)
 	if err != nil {
 		slog.ErrorContext(ctx, "Error", err)

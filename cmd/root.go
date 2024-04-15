@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"log/slog"
 
@@ -56,13 +57,22 @@ func init() {
 func initConfig() {
 	godotenv.Load()
 
+	viper.SetEnvPrefix("CFDDNS")
+
 	viper.BindEnv("CF.APIKey", "CF_API_KEY")
 	viper.BindEnv("CF.APIEmail", "CF_API_EMAIL")
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetDefault("loglevel", "info")
 	viper.SetDefault("logformat", "plain")
 	viper.SetDefault("dnsRefreshTime", "60s")
+	viper.SetDefault("mail.enabled", false)
+	viper.SetDefault("mail.from", "")
+	viper.SetDefault("mail.to", []string{""})
 	viper.SetDefault("mail.subject", "Your External IP has changed!")
+	viper.SetDefault("mail.auth.username", "")
+	viper.SetDefault("mail.auth.password", "")
 
 	// This code block is initializing the configuration settings for a Go program. It checks if a config
 	// file path has been provided as a command-line argument, and if so, sets the configuration file to
@@ -92,7 +102,7 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		slog.DebugContext(ctx, "Using config file", "filename", viper.ConfigFileUsed())
 	} else {
-		slog.ErrorContext(ctx, "error", err)
+		slog.ErrorContext(ctx, "error", "msg", err)
 	}
 
 	loggerConfig := loggergo.LoggerGoConfig{
@@ -102,7 +112,7 @@ func initConfig() {
 
 	_, err := loggergo.LoggerInit(loggerConfig)
 	if err != nil {
-		slog.ErrorContext(ctx, err.Error())
+		slog.ErrorContext(ctx, "error", "msg", err.Error())
 		os.Exit(1)
 	}
 }

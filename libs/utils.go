@@ -2,10 +2,12 @@ package libs
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/cloudflare/cloudflare-go"
@@ -35,7 +37,29 @@ func GetIP() (string, error) {
 	return "", fmt.Errorf("%s is not an IP address", ipAddr)
 }
 
-func PrepareRecordsFromConfig() []cloudflare.DNSRecord {
+func PrepareRecords() []cloudflare.DNSRecord {
+	_, present := os.LookupEnv(viper.GetEnvPrefix() + "_RECORDS")
+
+	if present {
+		return prepareRecordsFromEnv()
+	}
+
+	return prepareRecordsFromConfig()
+}
+
+func prepareRecordsFromEnv() []cloudflare.DNSRecord {
+	var records []cloudflare.DNSRecord
+
+	byt := []byte(viper.GetString("records"))
+
+	if err := json.Unmarshal(byt, &records); err != nil {
+		panic(err)
+	}
+
+	return records
+}
+
+func prepareRecordsFromConfig() []cloudflare.DNSRecord {
 	var records []cloudflare.DNSRecord
 	viper.UnmarshalKey("records", &records)
 	return records
