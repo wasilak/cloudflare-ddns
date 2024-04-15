@@ -25,6 +25,6 @@ var versionCmd = &cobra.Command{
 
 func versionFunc() error {
 	buildInfo, _ := debug.ReadBuildInfo()
-	fmt.Printf("go-dht\nVersion %s (GO %s)\n", version, buildInfo.GoVersion)
+	fmt.Printf("cloudflare-ddns\nVersion %s (GO %s)\n", version, buildInfo.GoVersion)
 	return nil
 }

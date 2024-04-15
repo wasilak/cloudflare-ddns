@@ -1,4 +1,5 @@
 FROM  quay.io/wasilak/golang:1.22-alpine as builder
+ARG VERSION=main
 
 LABEL org.opencontainers.image.source="https://github.com/wasilak/cloudflare-ddns"
 
@@ -8,7 +9,7 @@ WORKDIR /src
 
 COPY ./ .
 
-RUN go build .
+RUN go build -ldflags "-X github.com/wasilak/notes-manager/libs/common.Version=${VERSION}" -o /src/cloudflare-ddns .
 
 FROM quay.io/wasilak/alpine:3
 
