@@ -10,7 +10,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cloudflare/cloudflare-go"
 	"github.com/spf13/viper"
 	"github.com/wasilak/cloudflare-ddns/libs/cf"
 )
@@ -37,7 +36,7 @@ func GetIP() (string, error) {
 	return "", fmt.Errorf("%s is not an IP address", ipAddr)
 }
 
-func PrepareRecords() []cloudflare.DNSRecord {
+func PrepareRecords() []cf.ExtendedCloudflareDNSRecord {
 	_, present := os.LookupEnv(viper.GetEnvPrefix() + "_RECORDS")
 
 	if present {
@@ -47,8 +46,8 @@ func PrepareRecords() []cloudflare.DNSRecord {
 	return prepareRecordsFromConfig()
 }
 
-func prepareRecordsFromEnv() []cloudflare.DNSRecord {
-	var records []cloudflare.DNSRecord
+func prepareRecordsFromEnv() []cf.ExtendedCloudflareDNSRecord {
+	var records []cf.ExtendedCloudflareDNSRecord
 
 	byt := []byte(viper.GetString("records"))
 
@@ -59,14 +58,14 @@ func prepareRecordsFromEnv() []cloudflare.DNSRecord {
 	return records
 }
 
-func prepareRecordsFromConfig() []cloudflare.DNSRecord {
-	var records []cloudflare.DNSRecord
+func prepareRecordsFromConfig() []cf.ExtendedCloudflareDNSRecord {
+	var records []cf.ExtendedCloudflareDNSRecord
 	viper.UnmarshalKey("records", &records)
 	return records
 }
 
 // The Runner function updates DNS records for a given IP address using Cloudflare API.
-func Runner(ctx context.Context, records []cloudflare.DNSRecord) (string, error) {
+func Runner(ctx context.Context, records []cf.ExtendedCloudflareDNSRecord) (string, error) {
 	var wg sync.WaitGroup
 
 	ip, err := GetIP()
@@ -81,7 +80,7 @@ func Runner(ctx context.Context, records []cloudflare.DNSRecord) (string, error)
 	for _, record := range records {
 		wg.Add(1)
 		record.Content = ip
-		go runDNSUpdate(&wg, &cfAPI, record)
+		go runDNSUpdate(&wg, &cfAPI, record, viper.GetBool("triggerRecordDelete"))
 	}
 
 	wg.Wait()
@@ -90,7 +89,7 @@ func Runner(ctx context.Context, records []cloudflare.DNSRecord) (string, error)
 }
 
 // This function updates a DNS record with a given IP address and record name using the Cloudflare API.
-func runDNSUpdate(wg *sync.WaitGroup, cfAPI *cf.CF, record cloudflare.DNSRecord) {
-	cfAPI.RunDNSUpdate(record)
+func runDNSUpdate(wg *sync.WaitGroup, cfAPI *cf.CF, record cf.ExtendedCloudflareDNSRecord, triggerRecordDelete bool) {
+	cfAPI.RunDNSUpdate(record, triggerRecordDelete)
 	wg.Done()
 }

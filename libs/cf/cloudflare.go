@@ -14,6 +14,11 @@ type CF struct {
 	CTX context.Context
 }
 
+type ExtendedCloudflareDNSRecord struct {
+	cloudflare.DNSRecord
+	KeepAfterDelete bool `json:"keep_after_delete"`
+}
+
 // The function initializes a Cloudflare API client with the provided API key, email, and context.
 func (cf *CF) Init(CFAPIKey, CFAPIEmail string, ctx context.Context) {
 	cf.CTX = ctx
@@ -37,14 +42,18 @@ func (cf *CF) GetZoneID(zoneName string) string {
 }
 
 // This function retrieves a DNS record from Cloudflare using its ID.
-func (cf *CF) GetDNSRecord(rc *cloudflare.ResourceContainer, record cloudflare.DNSRecord) (cloudflare.DNSRecord, error) {
+func (cf *CF) GetDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedCloudflareDNSRecord) (ExtendedCloudflareDNSRecord, error) {
 
-	record, err := cf.API.GetDNSRecord(cf.CTX, rc, record.ID)
+	recordGet, err := cf.API.GetDNSRecord(cf.CTX, rc, record.ID)
 	if err != nil {
-		return record, err
+		return ExtendedCloudflareDNSRecord{}, err
 	}
 
-	return record, nil
+	convertedRecord := ExtendedCloudflareDNSRecord{
+		DNSRecord: recordGet,
+	}
+
+	return convertedRecord, nil
 }
 
 // The function creates a DNS record and logs its details.
@@ -88,9 +97,25 @@ func (cf *CF) updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflar
 	)
 }
 
+// This function deletes a DNS record and logs the changes.
+func (cf *CF) deleteDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedCloudflareDNSRecord) {
+
+	err := cf.API.DeleteDNSRecord(cf.CTX, rc, record.ID)
+	if err != nil {
+		slog.ErrorContext(cf.CTX, "DeleteDNSRecord error", "msg", err)
+	}
+
+	slog.InfoContext(cf.CTX, "Record deleted",
+		slog.String("Name", record.Name),
+		slog.String("Content", record.Content),
+		slog.Bool("Proxied", *record.Proxied),
+		slog.Int("TTL", record.TTL),
+	)
+}
+
 // The function updates a DNS record in Cloudflare by either creating a new record or updating an
 // existing one.
-func (cf *CF) RunDNSUpdate(record cloudflare.DNSRecord) {
+func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, triggerRecordDelete bool) {
 	zoneID := cf.GetZoneID(record.ZoneName)
 
 	rc := cloudflare.ZoneIdentifier(zoneID)
@@ -116,16 +141,24 @@ func (cf *CF) RunDNSUpdate(record cloudflare.DNSRecord) {
 	} else {
 		for _, item := range recs {
 
-			updateParams := cloudflare.UpdateDNSRecordParams{
-				ID:      item.ID,
-				Name:    item.Name,
-				Type:    record.Type,
-				Proxied: record.Proxied,
-				TTL:     record.TTL,
-				Content: record.Content,
+			convertedRecord := ExtendedCloudflareDNSRecord{
+				DNSRecord: item,
 			}
 
-			cf.updateDNSRecord(rc, updateParams)
+			if triggerRecordDelete && !convertedRecord.KeepAfterDelete {
+				cf.deleteDNSRecord(rc, convertedRecord)
+			} else {
+				updateParams := cloudflare.UpdateDNSRecordParams{
+					ID:      convertedRecord.ID,
+					Name:    convertedRecord.Name,
+					Type:    record.Type,
+					Proxied: record.Proxied,
+					TTL:     record.TTL,
+					Content: record.Content,
+				}
+
+				cf.updateDNSRecord(rc, updateParams)
+			}
 		}
 	}
 }
