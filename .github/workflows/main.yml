@@ -39,7 +39,8 @@ jobs:
           cache-dependency-path: go.sum
 
       - name: Build executable
-        run: go build -ldflags "-X github.com/wasilak/cloudflare-ddns/cmd.version=${{github.ref_name}}" -o ./dist/cloudflare-ddns
+        run: go build -ldflags "-X github.com/wasilak/cloudflare-ddns/cmd.version=${{github.ref_name}}"
+          -o ./dist/cloudflare-ddns
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
@@ -51,7 +52,7 @@ jobs:
           zip cloudflare-ddns-${{ matrix.os }}-${{ matrix.arch }}.zip cloudflare-ddns
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           generate_release_notes: true
