@@ -19,7 +19,7 @@ var oneoffCmd = &cobra.Command{
 		cmd.SetContext(ctx)
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		if err := oneoffFunc(cmd.Context()); err != nil {
+		if err := oneOffFunc(cmd.Context()); err != nil {
 			return err
 		}
 		return nil
@@ -27,9 +27,14 @@ var oneoffCmd = &cobra.Command{
 }
 
 // The function calls the Runner function from the libs package and returns any errors encountered.
-func oneoffFunc(ctx context.Context) error {
+func oneOffFunc(ctx context.Context) error {
+	currentIp, err := libs.GetIP()
+	if err != nil {
+		return err
+	}
+
 	records := libs.PrepareRecords()
-	_, err := libs.Runner(ctx, records)
+	err = libs.Runner(ctx, currentIp, records, false)
 	if err != nil {
 		return err
 	}

@@ -50,6 +50,7 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(oneoffCmd)
 	rootCmd.AddCommand(daemonCmd)
+	rootCmd.AddCommand(deleteCmd)
 }
 
 // The function initializes the configuration settings for a Go program, including loading environment
@@ -73,8 +74,6 @@ func initConfig() {
 	viper.SetDefault("mail.subject", "Your External IP has changed!")
 	viper.SetDefault("mail.auth.username", "")
 	viper.SetDefault("mail.auth.password", "")
-
-	viper.SetDefault("triggerRecordDelete", false)
 
 	// This code block is initializing the configuration settings for a Go program. It checks if a config
 	// file path has been provided as a command-line argument, and if so, sets the configuration file to

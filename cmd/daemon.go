@@ -96,31 +96,41 @@ func daemonFunc(ctx context.Context) error {
 		}
 	}()
 
-	currentIp := runRunner("")
+	currentIp, err := libs.GetIP()
+	if err != nil {
+		return err
+	}
+
+	// initial run
+	runRunner(currentIp)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(dnsRefreshTime):
-			runRunner(currentIp)
+			ip, err := libs.GetIP()
+			if err != nil {
+				return err
+			}
+
+			if ip != "" && currentIp != ip {
+				currentIp = ip
+				libs.Notify(ctx, ip)
+				runRunner(ip)
+			}
 		}
 	}
 }
 
-func runRunner(currentIp string) string {
+func runRunner(currentIp string) {
 	slog.DebugContext(ctx, "Starting DNS refresh...")
 
 	records := libs.PrepareRecords()
-	ip, err := libs.Runner(ctx, records)
+	err := libs.Runner(ctx, currentIp, records, false)
 	if err != nil {
 		slog.ErrorContext(ctx, "Error", err)
-	} else if ip != "" && currentIp != ip {
-		currentIp = ip
-		libs.Notify(ctx, ip)
 	}
 
 	slog.DebugContext(ctx, "DNS refresh completed.")
-
-	return currentIp
 }

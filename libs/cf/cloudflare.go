@@ -115,7 +115,7 @@ func (cf *CF) deleteDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedC
 
 // The function updates a DNS record in Cloudflare by either creating a new record or updating an
 // existing one.
-func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, triggerRecordDelete bool) {
+func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords bool) {
 	zoneID := cf.GetZoneID(record.ZoneName)
 
 	rc := cloudflare.ZoneIdentifier(zoneID)
@@ -145,7 +145,7 @@ func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, triggerRecordDele
 				DNSRecord: item,
 			}
 
-			if triggerRecordDelete && !convertedRecord.KeepAfterDelete {
+			if deleteRecords && !convertedRecord.KeepAfterDelete {
 				cf.deleteDNSRecord(rc, convertedRecord)
 			} else {
 				updateParams := cloudflare.UpdateDNSRecordParams{

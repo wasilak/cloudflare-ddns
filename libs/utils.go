@@ -65,13 +65,8 @@ func prepareRecordsFromConfig() []cf.ExtendedCloudflareDNSRecord {
 }
 
 // The Runner function updates DNS records for a given IP address using Cloudflare API.
-func Runner(ctx context.Context, records []cf.ExtendedCloudflareDNSRecord) (string, error) {
+func Runner(ctx context.Context, ip string, records []cf.ExtendedCloudflareDNSRecord, deleteRecords bool) error {
 	var wg sync.WaitGroup
-
-	ip, err := GetIP()
-	if err != nil {
-		return "", err
-	}
 
 	cfAPI := cf.CF{}
 
@@ -80,16 +75,16 @@ func Runner(ctx context.Context, records []cf.ExtendedCloudflareDNSRecord) (stri
 	for _, record := range records {
 		wg.Add(1)
 		record.Content = ip
-		go runDNSUpdate(&wg, &cfAPI, record, viper.GetBool("triggerRecordDelete"))
+		go runDNSUpdate(&wg, &cfAPI, record, deleteRecords)
 	}
 
 	wg.Wait()
 
-	return ip, nil
+	return nil
 }
 
 // This function updates a DNS record with a given IP address and record name using the Cloudflare API.
-func runDNSUpdate(wg *sync.WaitGroup, cfAPI *cf.CF, record cf.ExtendedCloudflareDNSRecord, triggerRecordDelete bool) {
-	cfAPI.RunDNSUpdate(record, triggerRecordDelete)
+func runDNSUpdate(wg *sync.WaitGroup, cfAPI *cf.CF, record cf.ExtendedCloudflareDNSRecord, deleteRecords bool) {
+	cfAPI.RunDNSUpdate(record, deleteRecords)
 	wg.Done()
 }
