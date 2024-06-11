@@ -141,16 +141,13 @@ func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords boo
 	} else {
 		for _, item := range recs {
 
-			convertedRecord := ExtendedCloudflareDNSRecord{
-				DNSRecord: item,
-			}
-
-			if deleteRecords && !convertedRecord.KeepAfterDelete {
-				cf.deleteDNSRecord(rc, convertedRecord)
+			if deleteRecords && !record.KeepAfterDelete {
+				record.ID = item.ID
+				cf.deleteDNSRecord(rc, record)
 			} else {
 				updateParams := cloudflare.UpdateDNSRecordParams{
-					ID:      convertedRecord.ID,
-					Name:    convertedRecord.Name,
+					ID:      item.ID,
+					Name:    item.Name,
 					Type:    record.Type,
 					Proxied: record.Proxied,
 					TTL:     record.TTL,
