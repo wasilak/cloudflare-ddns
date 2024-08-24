@@ -74,7 +74,13 @@ func Runner(ctx context.Context, ip string, records []cf.ExtendedCloudflareDNSRe
 
 	for _, record := range records {
 		wg.Add(1)
-		record.Content = ip
+
+		if record.Record.Type == "CNAME" {
+			record.Record.Content = record.CNAME
+		} else {
+			record.Record.Content = ip
+		}
+
 		go runDNSUpdate(&wg, &cfAPI, record, deleteRecords)
 	}
 

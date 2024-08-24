@@ -82,7 +82,7 @@ func daemonFunc(ctx context.Context) error {
 					if err := viper.ReadInConfig(); err == nil {
 						slog.DebugContext(ctx, "Using config file", "filename", viper.ConfigFileUsed())
 					} else {
-						slog.ErrorContext(ctx, "Error", err)
+						slog.ErrorContext(ctx, "Error", "error", err)
 					}
 				case os.Interrupt:
 					slog.DebugContext(ctx, "Stopping...")
@@ -129,7 +129,7 @@ func runRunner(currentIp string) {
 	records := libs.PrepareRecords()
 	err := libs.Runner(ctx, currentIp, records, false)
 	if err != nil {
-		slog.ErrorContext(ctx, "Error", err)
+		slog.ErrorContext(ctx, "Error", "error", err)
 	}
 
 	slog.DebugContext(ctx, "DNS refresh completed.")

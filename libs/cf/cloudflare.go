@@ -15,8 +15,9 @@ type CF struct {
 }
 
 type ExtendedCloudflareDNSRecord struct {
-	cloudflare.DNSRecord
-	KeepAfterDelete bool `json:"keep_after_delete"`
+	Record          cloudflare.DNSRecord `json:"record"`
+	KeepAfterDelete bool                 `json:"keep_after_delete,omitempty"`
+	CNAME           string               `json:"CNAME,omitempty"`
 }
 
 // The function initializes a Cloudflare API client with the provided API key, email, and context.
@@ -35,7 +36,8 @@ func (cf *CF) Init(CFAPIKey, CFAPIEmail string, ctx context.Context) {
 func (cf *CF) GetZoneID(zoneName string) string {
 	zoneID, err := cf.API.ZoneIDByName(zoneName)
 	if err != nil {
-		slog.ErrorContext(cf.CTX, err.Error())
+		slog.ErrorContext(cf.CTX, "Error GetZoneID", "error", err)
+		os.Exit(1)
 	}
 
 	return zoneID
@@ -44,13 +46,13 @@ func (cf *CF) GetZoneID(zoneName string) string {
 // This function retrieves a DNS record from Cloudflare using its ID.
 func (cf *CF) GetDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedCloudflareDNSRecord) (ExtendedCloudflareDNSRecord, error) {
 
-	recordGet, err := cf.API.GetDNSRecord(cf.CTX, rc, record.ID)
+	recordGet, err := cf.API.GetDNSRecord(cf.CTX, rc, record.Record.ID)
 	if err != nil {
 		return ExtendedCloudflareDNSRecord{}, err
 	}
 
 	convertedRecord := ExtendedCloudflareDNSRecord{
-		DNSRecord: recordGet,
+		Record: recordGet,
 	}
 
 	return convertedRecord, nil
@@ -100,41 +102,41 @@ func (cf *CF) updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflar
 // This function deletes a DNS record and logs the changes.
 func (cf *CF) deleteDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedCloudflareDNSRecord) {
 
-	err := cf.API.DeleteDNSRecord(cf.CTX, rc, record.ID)
+	err := cf.API.DeleteDNSRecord(cf.CTX, rc, record.Record.ID)
 	if err != nil {
 		slog.ErrorContext(cf.CTX, "DeleteDNSRecord error", "msg", err)
 	}
 
 	slog.InfoContext(cf.CTX, "Record deleted",
-		slog.String("Name", record.Name),
-		slog.String("Content", record.Content),
-		slog.Bool("Proxied", *record.Proxied),
-		slog.Int("TTL", record.TTL),
+		slog.String("Name", record.Record.Name),
+		slog.String("Content", record.Record.Content),
+		slog.Bool("Proxied", *record.Record.Proxied),
+		slog.Int("TTL", record.Record.TTL),
 	)
 }
 
 // The function updates a DNS record in Cloudflare by either creating a new record or updating an
 // existing one.
 func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords bool) {
-	zoneID := cf.GetZoneID(record.ZoneName)
+	zoneID := cf.GetZoneID(record.Record.ZoneName)
 
 	rc := cloudflare.ZoneIdentifier(zoneID)
 
 	// listing records, because we might not have their IDs
-	recs, _, err := cf.API.ListDNSRecords(cf.CTX, rc, cloudflare.ListDNSRecordsParams{Name: record.Name})
+	recs, _, err := cf.API.ListDNSRecords(cf.CTX, rc, cloudflare.ListDNSRecordsParams{Name: record.Record.Name})
 	if err != nil {
-		slog.ErrorContext(cf.CTX, err.Error())
+		slog.ErrorContext(cf.CTX, "Error", "error", err)
 	}
 
 	if len(recs) == 0 {
 		createParams := cloudflare.CreateDNSRecordParams{
-			Name:      record.Name,
-			Type:      record.Type,
-			Proxied:   record.Proxied,
-			Proxiable: record.Proxiable,
-			TTL:       record.TTL,
-			Content:   record.Content,
-			ZoneName:  record.ZoneName,
+			Name:      record.Record.Name,
+			Type:      record.Record.Type,
+			Proxied:   record.Record.Proxied,
+			Proxiable: record.Record.Proxiable,
+			TTL:       record.Record.TTL,
+			Content:   record.Record.Content,
+			ZoneName:  record.Record.ZoneName,
 			ZoneID:    zoneID,
 		}
 		cf.createDNSRecord(rc, createParams)
@@ -142,16 +144,16 @@ func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords boo
 		for _, item := range recs {
 
 			if deleteRecords && !record.KeepAfterDelete {
-				record.ID = item.ID
+				record.Record.ID = item.ID
 				cf.deleteDNSRecord(rc, record)
 			} else {
 				updateParams := cloudflare.UpdateDNSRecordParams{
 					ID:      item.ID,
 					Name:    item.Name,
-					Type:    record.Type,
-					Proxied: record.Proxied,
-					TTL:     record.TTL,
-					Content: record.Content,
+					Type:    record.Record.Type,
+					Proxied: record.Record.Proxied,
+					TTL:     record.Record.TTL,
+					Content: record.Record.Content,
 				}
 
 				cf.updateDNSRecord(rc, updateParams)

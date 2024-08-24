@@ -66,7 +66,7 @@ func initConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetDefault("loglevel", "info")
-	viper.SetDefault("logformat", "plain")
+	viper.SetDefault("logformat", "text")
 	viper.SetDefault("dnsRefreshTime", "60s")
 	viper.SetDefault("mail.enabled", false)
 	viper.SetDefault("mail.from", "")
@@ -106,14 +106,17 @@ func initConfig() {
 		slog.ErrorContext(ctx, "error", "msg", err)
 	}
 
-	loggerConfig := loggergo.LoggerGoConfig{
-		Level:  viper.GetString("loglevel"),
-		Format: viper.GetString("logformat"),
+	loggerConfig := loggergo.Config{
+		Level:   loggergo.LogLevelFromString(viper.GetString("loglevel")),
+		Format:  loggergo.LogFormatFromString(viper.GetString("logformat")),
+		DevMode: loggergo.LogLevelFromString(viper.GetString("loglevel")) == slog.LevelDebug,
 	}
 
-	_, err := loggergo.LoggerInit(loggerConfig)
+	_, err := loggergo.LoggerInit(ctx, loggerConfig)
 	if err != nil {
-		slog.ErrorContext(ctx, "error", "msg", err.Error())
+		slog.ErrorContext(ctx, "error", "msg", err)
 		os.Exit(1)
 	}
+
+	viper.WithLogger(slog.Default())
 }
