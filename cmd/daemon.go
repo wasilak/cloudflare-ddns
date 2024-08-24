@@ -129,7 +129,7 @@ func runRunner(currentIp string) {
 	records := libs.PrepareRecords()
 	err := libs.Runner(ctx, currentIp, records, false)
 	if err != nil {
-		slog.ErrorContext(ctx, "Error", "error", err)
+		slog.With("currentIp", currentIp).ErrorContext(ctx, "Error", "error", err)
 	}
 
 	slog.DebugContext(ctx, "DNS refresh completed.")
