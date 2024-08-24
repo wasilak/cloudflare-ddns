@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -76,6 +77,10 @@ func Runner(ctx context.Context, ip string, records []cf.ExtendedCloudflareDNSRe
 		wg.Add(1)
 
 		if record.Record.Type == "CNAME" {
+			if record.CNAME == "" {
+				slog.With("record", record).ErrorContext(ctx, "This is CNAME record but CNAME value is empty")
+				continue
+			}
 			record.Record.Content = record.CNAME
 		} else {
 			record.Record.Content = ip
