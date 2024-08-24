@@ -36,7 +36,7 @@ func (cf *CF) Init(CFAPIKey, CFAPIEmail string, ctx context.Context) {
 func (cf *CF) GetZoneID(zoneName string) string {
 	zoneID, err := cf.API.ZoneIDByName(zoneName)
 	if err != nil {
-		slog.ErrorContext(cf.CTX, "Error GetZoneID", "error", err)
+		slog.With("zoneName", zoneName).ErrorContext(cf.CTX, "Error GetZoneID", "error", err)
 		os.Exit(1)
 	}
 
@@ -62,12 +62,11 @@ func (cf *CF) GetDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedClou
 func (cf *CF) createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.CreateDNSRecordParams) {
 
 	record, err := cf.API.CreateDNSRecord(cf.CTX, rc, params)
-
 	if err != nil {
-		slog.ErrorContext(cf.CTX, err.Error())
+		slog.With("params", params).ErrorContext(cf.CTX, err.Error())
 	}
 
-	slog.InfoContext(cf.CTX, "Record created",
+	slog.With("params", params).InfoContext(cf.CTX, "Record created",
 		slog.String("Name", record.Name),
 		slog.String("Content", record.Content),
 		slog.Bool("Proxied", *record.Proxied),
@@ -84,7 +83,7 @@ func (cf *CF) updateDNSRecord(rc *cloudflare.ResourceContainer, params cloudflar
 
 	record, err := cf.API.UpdateDNSRecord(cf.CTX, rc, params)
 	if err != nil {
-		slog.ErrorContext(cf.CTX, "UpdateDNSRecord error")
+		slog.With("params", params).ErrorContext(cf.CTX, "UpdateDNSRecord error")
 	}
 
 	slog.InfoContext(cf.CTX, "Record updated",
@@ -104,7 +103,7 @@ func (cf *CF) deleteDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedC
 
 	err := cf.API.DeleteDNSRecord(cf.CTX, rc, record.Record.ID)
 	if err != nil {
-		slog.ErrorContext(cf.CTX, "DeleteDNSRecord error", "msg", err)
+		slog.With("record", record).ErrorContext(cf.CTX, "DeleteDNSRecord error", "msg", err)
 	}
 
 	slog.InfoContext(cf.CTX, "Record deleted",
@@ -125,7 +124,7 @@ func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords boo
 	// listing records, because we might not have their IDs
 	recs, _, err := cf.API.ListDNSRecords(cf.CTX, rc, cloudflare.ListDNSRecordsParams{Name: record.Record.Name})
 	if err != nil {
-		slog.ErrorContext(cf.CTX, "Error", "error", err)
+		slog.With("record", record).ErrorContext(cf.CTX, "Error", "error", err)
 	}
 
 	if len(recs) == 0 {
