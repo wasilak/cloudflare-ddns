@@ -15,9 +15,10 @@ type CF struct {
 }
 
 type ExtendedCloudflareDNSRecord struct {
-	Record          cloudflare.DNSRecord `json:"record"`
-	KeepAfterDelete bool                 `json:"keep_after_delete,omitempty"`
-	CNAME           string               `json:"CNAME,omitempty"`
+	Record          cloudflare.DNSRecord `mapstructure:"record"`
+	KeepAfterDelete bool                 `mapstructure:"keep_after_delete,omitempty"`
+	CNAME           string               `mapstructure:"CNAME,omitempty"`
+	ZoneName        string               `mapstructure:"zone_name"`
 }
 
 // The function initializes a Cloudflare API client with the provided API key, email, and context.
@@ -59,11 +60,11 @@ func (cf *CF) GetDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedClou
 }
 
 // The function creates a DNS record and logs its details.
-func (cf *CF) createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.CreateDNSRecordParams) {
+func (cf *CF) createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflare.CreateDNSRecordParams) error {
 
 	record, err := cf.API.CreateDNSRecord(cf.CTX, rc, params)
 	if err != nil {
-		slog.With("params", params).ErrorContext(cf.CTX, err.Error())
+		return err
 	}
 
 	slog.With("params", params).InfoContext(cf.CTX, "Record created",
@@ -76,6 +77,8 @@ func (cf *CF) createDNSRecord(rc *cloudflare.ResourceContainer, params cloudflar
 		slog.Bool("Updated", false),
 		slog.Bool("Created", true),
 	)
+
+	return nil
 }
 
 // This function updates a DNS record and logs the changes.
@@ -117,8 +120,8 @@ func (cf *CF) deleteDNSRecord(rc *cloudflare.ResourceContainer, record ExtendedC
 // The function updates a DNS record in Cloudflare by either creating a new record or updating an
 // existing one.
 func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords bool) {
-	zoneID := cf.GetZoneID(record.Record.ZoneName)
 
+	zoneID := cf.GetZoneID(record.ZoneName)
 	rc := cloudflare.ZoneIdentifier(zoneID)
 
 	// listing records, because we might not have their IDs
@@ -135,10 +138,11 @@ func (cf *CF) RunDNSUpdate(record ExtendedCloudflareDNSRecord, deleteRecords boo
 			Proxiable: record.Record.Proxiable,
 			TTL:       record.Record.TTL,
 			Content:   record.Record.Content,
-			ZoneName:  record.Record.ZoneName,
-			ZoneID:    zoneID,
 		}
 		cf.createDNSRecord(rc, createParams)
+		if err != nil {
+			slog.With("params", createParams).ErrorContext(cf.CTX, err.Error())
+		}
 	} else {
 		for _, item := range recs {
 
