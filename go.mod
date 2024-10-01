@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	github.com/cloudflare/cloudflare-go v0.106.0
+	github.com/cloudflare/cloudflare-go/v3 v3.1.0
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
