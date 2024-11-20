@@ -109,6 +109,8 @@ github.com/wasilak/loggergo v1.5.3 h1:+flzE0VrB5mLC3k0IK+fQugaB/beQD/ji0GYCceEoC
 github.com/wasilak/loggergo v1.5.3/go.mod h1:nB+vh2EuLMXH0LrFzWRORrNvmSsp+6M9+EsYwJmOAj0=
 github.com/wasilak/loggergo v1.5.4 h1:hVvkddAlCpqLAls7FWuX1Z12102OUrNdI/3m2RYCb/Y=
 github.com/wasilak/loggergo v1.5.4/go.mod h1:Bvt7I7+XxjVGd3qu9OMhuQdNf6/UN31VOdHmEeSY8C4=
+github.com/wasilak/loggergo v1.5.5 h1:78hzhj0HVOxJqomAAs3HWvCkAfULSAlnAxU5OoW3hCM=
+github.com/wasilak/loggergo v1.5.5/go.mod h1:sRL7W07YBJyPkoyaXzXrRFDsUH5s+olARYNe4S2DzXY=
 github.com/wasilak/otelgo v1.1.0 h1:nIwiiF/M4Gvnpx4c8WNfBeaY/vnBTGAXVQ3sSvDDcko=
 github.com/wasilak/otelgo v1.1.0/go.mod h1:UuXjo67rrc92ijHGfU9ut3MIos6gD1bC/k/5LqIyjmU=
 github.com/wasilak/otelgo v1.1.1 h1:f8p0VYTwSfPl0OC9BwO5r1DkQ/oNt9YoHTy19RQCNjs=
@@ -123,6 +125,8 @@ gitlab.com/greyxor/slogor v1.5.0 h1:9mwWDoK+gagAkYjSEEVi5QZ+5uq5KsF9khVsKJ/VSQc=
 gitlab.com/greyxor/slogor v1.5.0/go.mod h1:P8dDYZxKsh/omu91z+vep/m78GxWEOc2KP2f0zaCasE=
 gitlab.com/greyxor/slogor v1.5.1 h1:XdXkCAnoxcBV4j9AiPLjabQPP0yEd/mRYu6tTRY84UQ=
 gitlab.com/greyxor/slogor v1.5.1/go.mod h1:P8dDYZxKsh/omu91z+vep/m78GxWEOc2KP2f0zaCasE=
+gitlab.com/greyxor/slogor v1.5.2 h1:ushBskVMbduRt3mWLpIct9mOGAkxnytVNoSn2IHBgXM=
+gitlab.com/greyxor/slogor v1.5.2/go.mod h1:P8dDYZxKsh/omu91z+vep/m78GxWEOc2KP2f0zaCasE=
 go.opentelemetry.io/contrib/bridges/otelslog v0.4.0 h1:i66F95zqmrf3EyN5gu0E2pjTvCRZo/p8XIYidG3vOP8=
 go.opentelemetry.io/contrib/bridges/otelslog v0.4.0/go.mod h1:JuCiVizZ6ovLZLnYk1nGRUEAnmRJLKGh5v8DmwiKlhY=
 go.opentelemetry.io/contrib/bridges/otelslog v0.5.0 h1:lU3F57OSLK5mQ1PDBVAfDDaKCPv37MrEbCfTzsF4bz0=
@@ -251,6 +255,8 @@ google.golang.org/genproto/googleapis/api v0.0.0-20241007155032-5fefd90f89a9 h1:
 google.golang.org/genproto/googleapis/api v0.0.0-20241007155032-5fefd90f89a9/go.mod h1:wp2WsuBYj6j8wUdo3ToZsdxxixbvQNAHqVJrTgi5E5M=
 google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28 h1:M0KvPgPmDZHPlbRbaNU1APr28TvwvvdUPlSv7PUvy8g=
 google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28/go.mod h1:dguCy7UOdZhTvLzDyt15+rOrawrpM4q7DD9dQ1P11P4=
+google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697 h1:pgr/4QbFyktUv9CtQ/Fq4gzEE6/Xs7iCXbktaGzLHbQ=
+google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697/go.mod h1:+D9ySVjN8nY8YCVjc5O7PZDIdZporIDY3KaGfJunh88=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20240823204242-4ba0660f739c h1:Kqjm4WpoWvwhMPcrAczoTyMySQmYa9Wy2iL6Con4zn8=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20240823204242-4ba0660f739c/go.mod h1:UqMtugtsSgubUsoxbuAoiCXvqvErP7Gf0so0mK9tHxU=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20240930140551-af27646dc61f h1:cUMEy+8oS78BWIH9OWazBkzbr090Od9tWBNtZHkOhf0=
@@ -259,6 +265,8 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9 h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9/go.mod h1:GX3210XPVPUjJbTUbvwI8f2IpZDMZuPJWDzDuebbviI=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241104194629-dd2ea8efbc28 h1:XVhgTWWV3kGQlwJHR3upFWZeTsei6Oks1apkZSeonIE=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241104194629-dd2ea8efbc28/go.mod h1:GX3210XPVPUjJbTUbvwI8f2IpZDMZuPJWDzDuebbviI=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 h1:LWZqQOEjDyONlF1H6afSWpAL/znlREo2tHfLoe+8LMA=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697/go.mod h1:5uTbfoYQed2U9p3KIj2/Zzm02PYhndfdmML0qC3q3FU=
 google.golang.org/grpc v1.65.0 h1:bs/cUb4lp1G5iImFFd3u5ixQzweKizoZJAwBNLR42lc=
 google.golang.org/grpc v1.65.0/go.mod h1:WgYC2ypjlB0EiQi6wdKixMqukr6lBc0Vo+oOgjrM5ZQ=
 google.golang.org/grpc v1.67.1 h1:zWnc1Vrcno+lHZCOofnIMvycFcc0QRGIzm9dhnDX68E=
@@ -269,6 +277,8 @@ google.golang.org/protobuf v1.34.2 h1:6xV6lTsCfpGD21XK49h7MhtcApnLqkfYgPcdHftf6h
 google.golang.org/protobuf v1.34.2/go.mod h1:qYOHts0dSfpeUzUFpOMr/WGzszTmLH+DiWniOlNbLDw=
 google.golang.org/protobuf v1.35.1 h1:m3LfL6/Ca+fqnjnlqQXNpFPABW1UD7mjh8KO2mKFytA=
 google.golang.org/protobuf v1.35.1/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+google.golang.org/protobuf v1.35.2 h1:8Ar7bF+apOIoThw1EdZl0p1oWvMqTHmpA2fRTyZO8io=
+google.golang.org/protobuf v1.35.2/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc h1:2gGKlE2+asNV9m7xrywl36YYNnBG5ZQ0r/BOOxqPpmk=
 gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc/go.mod h1:m7x9LTH6d71AHyAX77c9yqWCCa3UKHcVEj9y7hAtKDk=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
