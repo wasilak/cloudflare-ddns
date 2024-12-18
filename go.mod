@@ -3,7 +3,7 @@ module github.com/wasilak/cloudflare-ddns
 go 1.23
 
 require (
-	github.com/cloudflare/cloudflare-go v0.111.0
+	github.com/cloudflare/cloudflare-go v0.112.0
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
@@ -17,7 +17,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/goccy/go-json v0.10.3 // indirect
+	github.com/goccy/go-json v0.10.4 // indirect
 	github.com/golang-cz/devslog v0.0.11 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
