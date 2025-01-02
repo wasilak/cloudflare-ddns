@@ -18,6 +18,8 @@ github.com/cloudflare/cloudflare-go v0.111.0 h1:bFgl5OyR7iaV9DkTaoI2jU8X4rXDzEaF
 github.com/cloudflare/cloudflare-go v0.111.0/go.mod h1:w5c4Vm00JjZM+W0mPi6QOC+eWLncGQPURtgDck3z5xU=
 github.com/cloudflare/cloudflare-go v0.112.0 h1:caFwqXdGJCl3rjVMgbPEn8iCYAg9JsRYV3dIVQE5d7g=
 github.com/cloudflare/cloudflare-go v0.112.0/go.mod h1:QB55kuJ5ZTeLNFcLJePfMuBilhu/LDKpLBmKFQIoSZ0=
+github.com/cloudflare/cloudflare-go v0.113.0 h1:qnOXmA6RbgZ4rg5gNBK5QGk0Pzbv8pnUYV3C4+8CU6w=
+github.com/cloudflare/cloudflare-go v0.113.0/go.mod h1:Dlm4BAnycHc0i8yLxQZb9b+OlMwYOAoDJsUOEFgpVvo=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
@@ -277,6 +279,8 @@ golang.org/x/net v0.31.0 h1:68CPQngjLL0r2AlUKiSxtQFKvzRVbnzLwMUn5SzcLHo=
 golang.org/x/net v0.31.0/go.mod h1:P4fl1q7dY2hnZFxEk4pPSkDHF+QqjitcnDjUQyMM+pM=
 golang.org/x/net v0.32.0 h1:ZqPmj8Kzc+Y6e0+skZsuACbx+wzMgo5MQsJh9Qd6aYI=
 golang.org/x/net v0.32.0/go.mod h1:CwU0IoeOlnQQWJ6ioyFrfRuomB8GKF6KbYXZVyeXNfs=
+golang.org/x/net v0.33.0 h1:74SYHlV8BIgHIFC/LrYkOGIwL19eTYXQ5wc6TBuO36I=
+golang.org/x/net v0.33.0/go.mod h1:HXLR5J+9DxmrqMwG9qjGCxZ+zKXxBru04zlTvWlWuN4=
 golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.24.0 h1:Twjiwq9dn6R1fQcyiK+wQyHWfaz/BJB+YIpzU/Cv3Xg=
 golang.org/x/sys v0.24.0/go.mod h1:/VUhepiaJMQUp4+oa/7Zr1D23ma6VTLIYjOOTFZPUcA=
