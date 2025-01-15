@@ -3,7 +3,7 @@ module github.com/wasilak/cloudflare-ddns
 go 1.23
 
 require (
-	github.com/cloudflare/cloudflare-go v0.114.0
+	github.com/cloudflare/cloudflare-go/v4 v4.0.0
 	github.com/cloudflare/cloudflare-go/v4 v4.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.8.1
