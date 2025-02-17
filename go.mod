@@ -7,7 +7,7 @@ toolchain go1.24.0
 require (
 	github.com/cloudflare/cloudflare-go/v4 v4.1.0
 	github.com/joho/godotenv v1.5.1
-	github.com/spf13/cobra v1.9.0
+	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
 	github.com/wasilak/loggergo v1.7.4
 	gopkg.in/mail.v2 v2.3.1
