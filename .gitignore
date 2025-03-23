@@ -88,3 +88,5 @@ cloudflare-ddns
 config.yml
 
 test.log
+
+tmp/*

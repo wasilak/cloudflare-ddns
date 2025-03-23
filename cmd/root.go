@@ -11,6 +11,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/wasilak/cloudflare-ddns/libs/api"
+	"github.com/wasilak/cloudflare-ddns/libs/cf"
 	"github.com/wasilak/loggergo"
 	loggergoLib "github.com/wasilak/loggergo/lib"
 	loggergoTypes "github.com/wasilak/loggergo/lib/types"
@@ -46,13 +48,14 @@ func Execute() {
 // and running as a daemon.
 func init() {
 	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initCF)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cloudflare-ddns/config.yml)")
+	rootCmd.PersistentFlags().String("listen", "127.0.0.1:3000", "listen address")
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(oneoffCmd)
 	rootCmd.AddCommand(daemonCmd)
-	rootCmd.AddCommand(deleteCmd)
 }
 
 // The function initializes the configuration settings for a Go program, including loading environment
@@ -76,6 +79,8 @@ func initConfig() {
 	viper.SetDefault("mail.subject", "Your External IP has changed!")
 	viper.SetDefault("mail.auth.username", "")
 	viper.SetDefault("mail.auth.password", "")
+
+	viper.BindPFlag("listen-addr", rootCmd.PersistentFlags().Lookup("listen"))
 
 	// This code block is initializing the configuration settings for a Go program. It checks if a config
 	// file path has been provided as a command-line argument, and if so, sets the configuration file to
@@ -109,9 +114,10 @@ func initConfig() {
 	}
 
 	loggerConfig := loggergoTypes.Config{
-		Level:   loggergoLib.LogLevelFromString(viper.GetString("loglevel")),
-		Format:  loggergoLib.LogFormatFromString(viper.GetString("logformat")),
-		DevMode: loggergoLib.LogLevelFromString(viper.GetString("loglevel")) == slog.LevelDebug,
+		Level:        loggergoLib.LogLevelFromString(viper.GetString("loglevel")),
+		Format:       loggergoLib.LogFormatFromString(viper.GetString("logformat")),
+		DevMode:      loggergoLib.LogLevelFromString(viper.GetString("loglevel")) == slog.LevelDebug,
+		SetAsDefault: true,
 	}
 
 	ctx, _, err := loggergo.Init(ctx, loggerConfig)
@@ -121,4 +127,10 @@ func initConfig() {
 	}
 
 	viper.WithLogger(slog.Default())
+}
+
+func initCF() {
+	api.CfAPI = cf.CF{}
+
+	api.CfAPI.Init(viper.GetString("CF.APIKey"), viper.GetString("CF.APIEmail"))
 }

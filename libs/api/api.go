@@ -1,0 +1,168 @@
+package api
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+
+	cloudflare "github.com/cloudflare/cloudflare-go/v4"
+	"github.com/cloudflare/cloudflare-go/v4/dns"
+	"github.com/wasilak/cloudflare-ddns/libs/cf"
+)
+
+var CfAPI cf.CF
+var Records = []cf.ExtendedCloudflareDNSRecord{}
+var CurrentIp string
+
+// The function updates a DNS record in Cloudflare by either creating a new record or updating an
+// existing one.
+func RunDNSUpdate(ctx context.Context, record cf.ExtendedCloudflareDNSRecord) error {
+
+	zoneID, err := CfAPI.GetZonesList(ctx, record.ZoneName)
+	if err != nil {
+		slog.With("record", record).ErrorContext(ctx, "Error", "error", err)
+		return err
+	}
+
+	r, err := CfAPI.GetDNSRecord(ctx, record, zoneID)
+	if err != nil {
+		return err
+	}
+
+	if r == nil || r.Record == nil || r.Record.ID == "" {
+		AddRecord(ctx, &record)
+	} else {
+		UpdateRecord(ctx, &record)
+	}
+
+	return nil
+}
+
+func FindDNSRecordByName(recordName string) *cf.ExtendedCloudflareDNSRecord {
+	for _, r := range Records {
+		if r.Record.Name == recordName {
+			return &r
+		}
+	}
+	return nil
+}
+
+func DeleteRecord(ctx context.Context, recordName string, zoneName string) (*cf.ExtendedCloudflareDNSRecord, error) {
+	var err error
+
+	zoneID, err := CfAPI.GetZonesList(ctx, zoneName)
+	if err != nil {
+		return nil, err
+	}
+
+	record := &cf.ExtendedCloudflareDNSRecord{
+		Record: &dns.RecordResponse{
+			Name: recordName,
+		},
+	}
+
+	record, err = CfAPI.GetDNSRecord(ctx, *record, zoneID)
+	if err != nil {
+		return nil, err
+	}
+
+	if record == nil || record.Record == nil || record.Record.ID == "" {
+		return nil, fmt.Errorf("record not found")
+	}
+
+	response, err := CfAPI.DeleteDNSRecord(ctx, *record, zoneID)
+	if err != nil {
+		return nil, err
+	}
+
+	slog.With("record", record).DebugContext(ctx, "Record deleted", "response", response)
+
+	for i, r := range Records {
+		if r.Record.Name == record.Record.Name {
+			Records = append(Records[:i], Records[i+1:]...)
+			break
+		}
+	}
+	return record, nil
+}
+
+func AddRecord(ctx context.Context, record *cf.ExtendedCloudflareDNSRecord) (*cf.ExtendedCloudflareDNSRecord, error) {
+	zoneID, err := CfAPI.GetZonesList(ctx, record.ZoneName)
+	if err != nil {
+		return nil, err
+	}
+
+	createParams := dns.RecordNewParams{
+		ZoneID: cloudflare.F(zoneID),
+		Record: dns.RecordParam{
+			Name:    cloudflare.F(record.Record.Name),
+			Type:    cloudflare.F(dns.RecordType(record.Record.Type)),
+			Proxied: cloudflare.F(record.Record.Proxied),
+			TTL:     cloudflare.F(record.Record.TTL),
+			Content: cloudflare.F(CurrentIp),
+		},
+	}
+
+	response, err := CfAPI.CreateDNSRecord(ctx, createParams)
+	if err != nil {
+		return nil, err
+	}
+
+	slog.With("record", record).DebugContext(ctx, "Record create", "response", response)
+
+	Records = append(Records, *record)
+	return record, nil
+}
+
+func UpdateRecord(ctx context.Context, updatedRecord *cf.ExtendedCloudflareDNSRecord) (*cf.ExtendedCloudflareDNSRecord, error) {
+	zoneID, err := CfAPI.GetZonesList(ctx, updatedRecord.ZoneName)
+	if err != nil {
+		return nil, err
+	}
+
+	record, err := CfAPI.GetDNSRecord(ctx, *updatedRecord, zoneID)
+	if err != nil {
+		return nil, err
+	}
+
+	if record == nil || record.Record == nil || record.Record.ID == "" {
+		return nil, fmt.Errorf("record not found")
+	}
+
+	slog.With("record", record).DebugContext(ctx, "Updating record", "updatedRecord", updatedRecord)
+
+	record.ZoneName = updatedRecord.ZoneName
+
+	updateParams := dns.RecordUpdateParams{
+		ZoneID: cloudflare.F(zoneID),
+		Record: dns.RecordParam{
+			Name:    cloudflare.F(updatedRecord.Record.Name),
+			Type:    cloudflare.F(dns.RecordType(updatedRecord.Record.Type)),
+			Proxied: cloudflare.F(updatedRecord.Record.Proxied),
+			TTL:     cloudflare.F(updatedRecord.Record.TTL),
+			Content: cloudflare.F(CurrentIp),
+		},
+	}
+
+	response, err := CfAPI.UpdateDNSRecord(ctx, record.Record.ID, updateParams)
+	if err != nil {
+		for i, r := range Records {
+			if r.Record.Name == record.Record.Name {
+				Records = append(Records[:i], Records[i+1:]...)
+				break
+			}
+		}
+		return nil, err
+	}
+
+	for i, r := range Records {
+		if r.Record.Name == record.Record.Name {
+			Records[i] = cf.ExtendedCloudflareDNSRecord{
+				Record: response,
+			}
+			break
+		}
+	}
+
+	return record, nil
+}

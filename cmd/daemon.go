@@ -12,6 +12,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/wasilak/cloudflare-ddns/libs"
+	"github.com/wasilak/cloudflare-ddns/libs/api"
+	"github.com/wasilak/cloudflare-ddns/libs/web"
+	"github.com/wasilak/loggergo"
 )
 
 // This code defines a Cobra command called `daemon` with a `Use` string of "daemon" and a `Short`
@@ -36,6 +39,7 @@ var daemonCmd = &cobra.Command{
 // This function runs a daemon that periodically refreshes DNS and notifies if the IP address has
 // changed.
 func daemonFunc(ctx context.Context) error {
+	ctx, cancel := context.WithCancel(ctx)
 
 	// This code is parsing the value of the `dnsRefreshTime` configuration parameter from the Viper
 	// configuration object as a duration using the `time.ParseDuration` function. If there is an error
@@ -48,7 +52,16 @@ func daemonFunc(ctx context.Context) error {
 
 	slog.DebugContext(ctx, "Refresh Time", "dnsRefreshTime", dnsRefreshTime)
 
-	ctx, cancel := context.WithCancel(ctx)
+	frameworkOptions := web.FrameworkOptions{
+		ListenAddr:     viper.GetString("listen-addr"),
+		OtelEnabled:    viper.GetBool("otel-enabled"),
+		LogLevelConfig: loggergo.GetLogLevelAccessor(),
+	}
+
+	server := &web.Server{WebServer: &web.WebServer{
+		FrameworkOptions: frameworkOptions,
+	}}
+	server.Start(ctx, frameworkOptions)
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGHUP)
@@ -96,13 +109,15 @@ func daemonFunc(ctx context.Context) error {
 		}
 	}()
 
-	currentIp, err := libs.GetIP()
+	api.CurrentIp, err = libs.GetIP()
 	if err != nil {
 		return err
 	}
 
+	api.Records = libs.PrepareRecords()
+
 	// initial run
-	runRunner(currentIp)
+	runRunner()
 
 	for {
 		select {
@@ -114,22 +129,21 @@ func daemonFunc(ctx context.Context) error {
 				return err
 			}
 
-			if ip != "" && currentIp != ip {
-				currentIp = ip
+			if ip != "" && api.CurrentIp != ip {
+				api.CurrentIp = ip
 				libs.Notify(ctx, ip)
-				runRunner(ip)
+				runRunner()
 			}
 		}
 	}
 }
 
-func runRunner(currentIp string) {
+func runRunner() {
 	slog.DebugContext(ctx, "Starting DNS refresh...")
 
-	records := libs.PrepareRecords()
-	err := libs.Runner(ctx, currentIp, records, false)
+	err := libs.Runner(ctx, api.Records)
 	if err != nil {
-		slog.With("currentIp", currentIp).ErrorContext(ctx, "Error", "error", err)
+		slog.With("currentIp").ErrorContext(ctx, "Error", "error", err)
 	}
 
 	slog.DebugContext(ctx, "DNS refresh completed.")
