@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"log/slog"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/wasilak/cloudflare-ddns/libs"
@@ -35,8 +36,9 @@ func oneOffFunc(ctx context.Context) error {
 	if err != nil {
 		return err
 	} else {
-		slog.DebugContext(ctx, "External IP: %s (from %s)", ip.CurrentIp.IP, ip.CurrentIp.Source.GetName())
+		slog.DebugContext(ctx, "External IP", "ip", ip.CurrentIp.IP, "ip_source", ip.CurrentIp.Source.GetName())
 	}
+	os.Exit(0)
 
 	records := libs.PrepareRecords()
 	err = libs.Runner(ctx, records)

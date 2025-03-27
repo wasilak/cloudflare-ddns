@@ -112,7 +112,7 @@ func daemonFunc(ctx context.Context) error {
 
 	ip.CurrentIp, err = ip.GetIP(ctx)
 	if err == nil {
-		slog.DebugContext(ctx, "External IP: %s (from %s)", ip.CurrentIp.IP, ip.CurrentIp.Source.GetName())
+		slog.DebugContext(ctx, "External IP", "ip", ip.CurrentIp.IP, "ip_source", ip.CurrentIp.Source.GetName())
 	}
 
 	api.Records = libs.PrepareRecords()
