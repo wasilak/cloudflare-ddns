@@ -7,12 +7,12 @@ toolchain go1.24.1
 require (
 	github.com/cloudflare/cloudflare-go/v4 v4.2.0
 	github.com/joho/godotenv v1.5.1
-	github.com/labstack/echo-contrib v0.17.2
+	github.com/labstack/echo-contrib v0.17.3
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/prometheus/client_golang v1.21.1
 	github.com/samber/slog-echo v1.16.1
 	github.com/spf13/cobra v1.9.1
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	github.com/wasilak/loggergo v1.7.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.60.0
 	gopkg.in/mail.v2 v2.3.1
