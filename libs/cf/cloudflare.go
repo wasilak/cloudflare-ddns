@@ -15,9 +15,9 @@ type CF struct {
 }
 
 type ExtendedCloudflareDNSRecord struct {
-	Record   *dns.RecordResponse `mapstructure:"record" json:"record"`
-	CNAME    string              `mapstructure:"CNAME,omitempty" json:"CNAME,omitempty"`
-	ZoneName string              `mapstructure:"zone_name" json:"zone_name"`
+	Record   *dns.RecordResponse `mapstructure:"record" json:"record" yaml:"record"`
+	CNAME    string              `mapstructure:"CNAME,omitempty" json:"CNAME,omitempty" yaml:"CNAME,omitempty"`
+	ZoneName string              `mapstructure:"zone_name" json:"zone_name" yaml:"zone_name"`
 }
 
 // The function initializes a Cloudflare API client with the provided API key, email, and context.
