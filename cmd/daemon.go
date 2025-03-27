@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -133,7 +132,7 @@ func daemonFunc(ctx context.Context) error {
 				continue // try again next tick
 			}
 
-			if current_ip != nil && ip.CurrentIp != current_ip {
+			if current_ip != nil && ip.CurrentIp.IP != current_ip.IP {
 				ip.CurrentIp = current_ip
 				libs.Notify(ctx, current_ip.IP)
 				runRunner()
@@ -144,8 +143,6 @@ func daemonFunc(ctx context.Context) error {
 
 func runRunner() {
 	slog.DebugContext(ctx, "Starting DNS refresh...")
-
-	fmt.Printf("%+v\n", api.Records)
 
 	err := libs.Runner(ctx, api.Records)
 	if err != nil {
