@@ -90,3 +90,5 @@ config.yml
 test.log
 
 tmp/*
+
+.vscode/

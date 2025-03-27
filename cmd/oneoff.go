@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wasilak/cloudflare-ddns/libs"
+	"github.com/wasilak/cloudflare-ddns/libs/api"
 	"github.com/wasilak/cloudflare-ddns/libs/ip"
 )
 
@@ -38,8 +39,8 @@ func oneOffFunc(ctx context.Context) error {
 		slog.DebugContext(ctx, "External IP", "ip", ip.CurrentIp.IP, "ip_source", ip.CurrentIp.Source.GetName())
 	}
 
-	records := libs.PrepareRecords()
-	err = libs.Runner(ctx, records)
+	api.Records = libs.PrepareRecords()
+	err = libs.Runner(ctx, api.Records)
 	if err != nil {
 		return err
 	}

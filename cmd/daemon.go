@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -143,6 +144,8 @@ func daemonFunc(ctx context.Context) error {
 
 func runRunner() {
 	slog.DebugContext(ctx, "Starting DNS refresh...")
+
+	fmt.Printf("%+v\n", api.Records)
 
 	err := libs.Runner(ctx, api.Records)
 	if err != nil {

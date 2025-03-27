@@ -2,6 +2,7 @@ package cf
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 
 	cloudflare "github.com/cloudflare/cloudflare-go/v4"
@@ -39,7 +40,7 @@ func (cf *CF) GetZonesList(ctx context.Context, zoneName string) (string, error)
 
 	if len(zones.Result) == 0 {
 		slog.With("zoneName", zoneName).ErrorContext(ctx, "Zone not found")
-		return "", nil
+		return "", fmt.Errorf("zone not found")
 	}
 
 	return zones.Result[0].ID, nil
@@ -84,7 +85,9 @@ func (cf *CF) GetDNSRecord(ctx context.Context, record ExtendedCloudflareDNSReco
 	}
 
 	convertedRecord := ExtendedCloudflareDNSRecord{
-		Record: recordGet,
+		Record:   recordGet,
+		ZoneName: record.ZoneName,
+		CNAME:    record.CNAME,
 	}
 
 	return &convertedRecord, nil

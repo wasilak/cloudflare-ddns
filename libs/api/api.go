@@ -12,7 +12,7 @@ import (
 )
 
 var CfAPI cf.CF
-var Records = []cf.ExtendedCloudflareDNSRecord{}
+var Records = &[]cf.ExtendedCloudflareDNSRecord{}
 
 // The function updates a DNS record in Cloudflare by either creating a new record or updating an
 // existing one.
@@ -39,7 +39,7 @@ func RunDNSUpdate(ctx context.Context, record cf.ExtendedCloudflareDNSRecord) er
 }
 
 func FindDNSRecordByName(recordName string) *cf.ExtendedCloudflareDNSRecord {
-	for _, r := range Records {
+	for _, r := range *Records {
 		if r.Record.Name == recordName {
 			return &r
 		}
@@ -77,9 +77,10 @@ func DeleteRecord(ctx context.Context, recordName string, zoneName string) (*cf.
 
 	slog.With("record", record).DebugContext(ctx, "Record deleted", "response", response)
 
-	for i, r := range Records {
+	for i, r := range *Records {
 		if r.Record.Name == record.Record.Name {
-			Records = append(Records[:i], Records[i+1:]...)
+			*Records = (*Records)[:i]
+			*Records = append(*Records, (*Records)[i+1:]...)
 			break
 		}
 	}
@@ -110,7 +111,7 @@ func AddRecord(ctx context.Context, record *cf.ExtendedCloudflareDNSRecord) (*cf
 
 	slog.With("record", record).DebugContext(ctx, "Record create", "response", response)
 
-	Records = append(Records, *record)
+	*Records = append(*Records, *record)
 	return record, nil
 }
 
@@ -129,7 +130,7 @@ func UpdateRecord(ctx context.Context, updatedRecord *cf.ExtendedCloudflareDNSRe
 		return nil, fmt.Errorf("record not found")
 	}
 
-	slog.With("record", record).DebugContext(ctx, "Updating record", "updatedRecord", updatedRecord)
+	slog.With(PrepareRecordForLoggiong("record", record)).DebugContext(ctx, "Updating record", PrepareRecordForLoggiong("updatedRecord", updatedRecord))
 
 	record.ZoneName = updatedRecord.ZoneName
 
@@ -146,23 +147,37 @@ func UpdateRecord(ctx context.Context, updatedRecord *cf.ExtendedCloudflareDNSRe
 
 	response, err := CfAPI.UpdateDNSRecord(ctx, record.Record.ID, updateParams)
 	if err != nil {
-		for i, r := range Records {
+		for i, r := range *Records {
 			if r.Record.Name == record.Record.Name {
-				Records = append(Records[:i], Records[i+1:]...)
+				records := *Records
+				*Records = append(records[:i], records[i+1:]...)
 				break
 			}
 		}
 		return nil, err
 	}
 
-	for i, r := range Records {
+	for i, r := range *Records {
 		if r.Record.Name == record.Record.Name {
-			Records[i] = cf.ExtendedCloudflareDNSRecord{
-				Record: response,
+			(*Records)[i] = cf.ExtendedCloudflareDNSRecord{
+				Record:   response,
+				ZoneName: record.ZoneName,
+				CNAME:    record.CNAME,
 			}
 			break
 		}
 	}
 
 	return record, nil
+}
+
+func PrepareRecordForLoggiong(name string, record *cf.ExtendedCloudflareDNSRecord) slog.Attr {
+	return slog.Group(name,
+		slog.String("name", record.Record.Name),
+		slog.String("content", record.Record.Content),
+		slog.Bool("proxied", record.Record.Proxied),
+		slog.Int("ttl", int(record.Record.TTL)),
+		slog.String("zoneName", record.ZoneName),
+		slog.String("type", string(record.Record.Type)),
+	)
 }

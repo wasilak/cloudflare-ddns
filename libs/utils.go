@@ -13,7 +13,7 @@ import (
 	"github.com/wasilak/cloudflare-ddns/libs/ip"
 )
 
-func PrepareRecords() []cf.ExtendedCloudflareDNSRecord {
+func PrepareRecords() *[]cf.ExtendedCloudflareDNSRecord {
 	_, present := os.LookupEnv(viper.GetEnvPrefix() + "_RECORDS")
 
 	if present {
@@ -23,8 +23,8 @@ func PrepareRecords() []cf.ExtendedCloudflareDNSRecord {
 	return prepareRecordsFromConfig()
 }
 
-func prepareRecordsFromEnv() []cf.ExtendedCloudflareDNSRecord {
-	var records []cf.ExtendedCloudflareDNSRecord
+func prepareRecordsFromEnv() *[]cf.ExtendedCloudflareDNSRecord {
+	var records *[]cf.ExtendedCloudflareDNSRecord
 
 	byt := []byte(viper.GetString("records"))
 
@@ -35,22 +35,22 @@ func prepareRecordsFromEnv() []cf.ExtendedCloudflareDNSRecord {
 	return records
 }
 
-func prepareRecordsFromConfig() []cf.ExtendedCloudflareDNSRecord {
-	var records []cf.ExtendedCloudflareDNSRecord
+func prepareRecordsFromConfig() *[]cf.ExtendedCloudflareDNSRecord {
+	var records *[]cf.ExtendedCloudflareDNSRecord
 	viper.UnmarshalKey("records", &records)
 	return records
 }
 
 // The Runner function updates DNS records for a given IP address using Cloudflare API.
-func Runner(ctx context.Context, records []cf.ExtendedCloudflareDNSRecord) error {
+func Runner(ctx context.Context, records *[]cf.ExtendedCloudflareDNSRecord) error {
 	var wg sync.WaitGroup
 
-	for _, record := range records {
+	for _, record := range *records {
 		wg.Add(1)
 
 		if record.Record.Type == "CNAME" {
 			if record.CNAME == "" {
-				slog.With("record", record).ErrorContext(ctx, "This is CNAME record but CNAME value is empty")
+				slog.With(api.PrepareRecordForLoggiong("record", &record)).ErrorContext(ctx, "This is CNAME record but CNAME value is empty")
 				continue
 			}
 			record.Record.Content = record.CNAME
@@ -70,7 +70,7 @@ func Runner(ctx context.Context, records []cf.ExtendedCloudflareDNSRecord) error
 func runDNSUpdate(wg *sync.WaitGroup, ctx context.Context, record cf.ExtendedCloudflareDNSRecord) {
 	err := api.RunDNSUpdate(ctx, record)
 	if err != nil {
-		slog.With("record", record).ErrorContext(ctx, "RunDNSUpdate Error", "error", err)
+		slog.With(api.PrepareRecordForLoggiong("record", &record)).ErrorContext(ctx, "RunDNSUpdate Error", "error", err)
 	}
 	wg.Done()
 }
