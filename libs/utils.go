@@ -3,40 +3,15 @@ package libs
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
 	"log/slog"
-	"net"
-	"net/http"
 	"os"
 	"sync"
 
 	"github.com/spf13/viper"
 	"github.com/wasilak/cloudflare-ddns/libs/api"
 	"github.com/wasilak/cloudflare-ddns/libs/cf"
+	"github.com/wasilak/cloudflare-ddns/libs/ip"
 )
-
-// The function retrieves the public IP address of the device it is running on.
-func GetIP() (string, error) {
-	res, err := http.Get("https://api.ipify.org")
-
-	if err != nil {
-		return "", err
-	}
-
-	ip, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-
-	ipAddr := string(ip)
-
-	if net.ParseIP(ipAddr) != nil {
-		return ipAddr, nil
-	}
-
-	return "", fmt.Errorf("%s is not an IP address", ipAddr)
-}
 
 func PrepareRecords() []cf.ExtendedCloudflareDNSRecord {
 	_, present := os.LookupEnv(viper.GetEnvPrefix() + "_RECORDS")
@@ -80,7 +55,7 @@ func Runner(ctx context.Context, records []cf.ExtendedCloudflareDNSRecord) error
 			}
 			record.Record.Content = record.CNAME
 		} else {
-			record.Record.Content = api.CurrentIp
+			record.Record.Content = ip.CurrentIp.IP
 		}
 
 		go runDNSUpdate(&wg, ctx, record)

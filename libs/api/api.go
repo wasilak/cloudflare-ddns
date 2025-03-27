@@ -8,11 +8,11 @@ import (
 	cloudflare "github.com/cloudflare/cloudflare-go/v4"
 	"github.com/cloudflare/cloudflare-go/v4/dns"
 	"github.com/wasilak/cloudflare-ddns/libs/cf"
+	"github.com/wasilak/cloudflare-ddns/libs/ip"
 )
 
 var CfAPI cf.CF
 var Records = []cf.ExtendedCloudflareDNSRecord{}
-var CurrentIp string
 
 // The function updates a DNS record in Cloudflare by either creating a new record or updating an
 // existing one.
@@ -99,7 +99,7 @@ func AddRecord(ctx context.Context, record *cf.ExtendedCloudflareDNSRecord) (*cf
 			Type:    cloudflare.F(dns.RecordType(record.Record.Type)),
 			Proxied: cloudflare.F(record.Record.Proxied),
 			TTL:     cloudflare.F(record.Record.TTL),
-			Content: cloudflare.F(CurrentIp),
+			Content: cloudflare.F(ip.CurrentIp.IP),
 		},
 	}
 
@@ -140,7 +140,7 @@ func UpdateRecord(ctx context.Context, updatedRecord *cf.ExtendedCloudflareDNSRe
 			Type:    cloudflare.F(dns.RecordType(updatedRecord.Record.Type)),
 			Proxied: cloudflare.F(updatedRecord.Record.Proxied),
 			TTL:     cloudflare.F(updatedRecord.Record.TTL),
-			Content: cloudflare.F(CurrentIp),
+			Content: cloudflare.F(ip.CurrentIp.IP),
 		},
 	}
 

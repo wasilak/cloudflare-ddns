@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/spf13/cobra"
 	"github.com/wasilak/cloudflare-ddns/libs"
-	"github.com/wasilak/cloudflare-ddns/libs/api"
+	"github.com/wasilak/cloudflare-ddns/libs/ip"
 )
 
 // This code defines a Cobra command called "oneoff" which can be executed from the command line. The
@@ -30,9 +31,11 @@ var oneoffCmd = &cobra.Command{
 // The function calls the Runner function from the libs package and returns any errors encountered.
 func oneOffFunc(ctx context.Context) error {
 	var err error
-	api.CurrentIp, err = libs.GetIP()
+	ip.CurrentIp, err = ip.GetIP(ctx)
 	if err != nil {
 		return err
+	} else {
+		slog.DebugContext(ctx, "External IP: %s (from %s)", ip.CurrentIp.IP, ip.CurrentIp.Source.GetName())
 	}
 
 	records := libs.PrepareRecords()

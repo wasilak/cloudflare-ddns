@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/wasilak/cloudflare-ddns/libs"
 	"github.com/wasilak/cloudflare-ddns/libs/api"
+	"github.com/wasilak/cloudflare-ddns/libs/ip"
 	"github.com/wasilak/cloudflare-ddns/libs/web"
 	"github.com/wasilak/loggergo"
 )
@@ -109,9 +110,9 @@ func daemonFunc(ctx context.Context) error {
 		}
 	}()
 
-	api.CurrentIp, err = libs.GetIP()
-	if err != nil {
-		return err
+	ip.CurrentIp, err = ip.GetIP(ctx)
+	if err == nil {
+		slog.DebugContext(ctx, "External IP: %s (from %s)", ip.CurrentIp.IP, ip.CurrentIp.Source.GetName())
 	}
 
 	api.Records = libs.PrepareRecords()
@@ -124,14 +125,16 @@ func daemonFunc(ctx context.Context) error {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(dnsRefreshTime):
-			ip, err := libs.GetIP()
+			current_ip, err := ip.GetIP(ctx)
 			if err != nil {
-				return err
+				// Log the error and continue
+				slog.WarnContext(ctx, "Failed to get external IP", "error", err)
+				continue // try again next tick
 			}
 
-			if ip != "" && api.CurrentIp != ip {
-				api.CurrentIp = ip
-				libs.Notify(ctx, ip)
+			if current_ip != nil && ip.CurrentIp != current_ip {
+				ip.CurrentIp = current_ip
+				libs.Notify(ctx, current_ip.IP)
 				runRunner()
 			}
 		}
