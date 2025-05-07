@@ -2,7 +2,7 @@ module github.com/wasilak/cloudflare-ddns
 
 go 1.24
 
-toolchain go1.24.2
+toolchain go1.24.3
 
 require (
 	github.com/cloudflare/cloudflare-go/v4 v4.3.0
