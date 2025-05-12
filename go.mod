@@ -13,7 +13,7 @@ require (
 	github.com/samber/slog-echo v1.16.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/wasilak/loggergo v1.7.6
+	github.com/wasilak/loggergo v1.7.7
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.60.0
 	gopkg.in/mail.v2 v2.3.1
 )
@@ -54,7 +54,7 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	github.com/wasilak/otelgo v1.2.5 // indirect
+	github.com/wasilak/otelgo v1.2.6 // indirect
 	github.com/xybor-x/enum v1.4.0 // indirect
 	gitlab.com/greyxor/slogor v1.6.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
