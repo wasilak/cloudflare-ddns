@@ -5,7 +5,8 @@ go 1.24
 toolchain go1.25.0
 
 require (
-	github.com/cloudflare/cloudflare-go/v4 v4.4.0
+	github.com/cloudflare/cloudflare-go/v4 v4.6.0
+	github.com/cloudflare/cloudflare-go/v5 v5.1.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.17.4
 	github.com/labstack/echo/v4 v4.13.4
