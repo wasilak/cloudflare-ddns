@@ -95,12 +95,12 @@ func AddRecord(ctx context.Context, record *cf.ExtendedCloudflareDNSRecord) (*cf
 
 	createParams := dns.RecordNewParams{
 		ZoneID: cloudflare.F(zoneID),
-		Record: dns.RecordParam{
+		Body: dns.ARecordParam{
 			Name:    cloudflare.F(record.Record.Name),
-			Type:    cloudflare.F(dns.RecordType(record.Record.Type)),
-			Proxied: cloudflare.F(record.Record.Proxied),
-			TTL:     cloudflare.F(record.Record.TTL),
+			Type:    cloudflare.F(dns.ARecordTypeA),
 			Content: cloudflare.F(ip.CurrentIp.IP),
+			TTL:     cloudflare.F(dns.TTL(record.Record.TTL)),
+			Proxied: cloudflare.F(record.Record.Proxied),
 		},
 	}
 
@@ -136,12 +136,12 @@ func UpdateRecord(ctx context.Context, updatedRecord *cf.ExtendedCloudflareDNSRe
 
 	updateParams := dns.RecordUpdateParams{
 		ZoneID: cloudflare.F(zoneID),
-		Record: dns.RecordParam{
+		Body: dns.ARecordParam{
 			Name:    cloudflare.F(updatedRecord.Record.Name),
-			Type:    cloudflare.F(dns.RecordType(updatedRecord.Record.Type)),
-			Proxied: cloudflare.F(updatedRecord.Record.Proxied),
-			TTL:     cloudflare.F(updatedRecord.Record.TTL),
+			Type:    cloudflare.F(dns.ARecordTypeA),
 			Content: cloudflare.F(ip.CurrentIp.IP),
+			TTL:     cloudflare.F(dns.TTL(updatedRecord.Record.TTL)),
+			Proxied: cloudflare.F(updatedRecord.Record.Proxied),
 		},
 	}
 
