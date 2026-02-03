@@ -7,14 +7,14 @@ require (
 	github.com/cloudflare/cloudflare-go/v6 v6.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.17.4
-	github.com/labstack/echo/v4 v4.13.4
+	github.com/labstack/echo/v4 v4.15.0
 	github.com/labstack/echo/v5 v5.0.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/samber/slog-echo v1.19.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/wasilak/loggergo v1.8.2
-	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.64.0
+	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.65.0
 	gopkg.in/mail.v2 v2.3.1
 )
 
@@ -61,15 +61,15 @@ require (
 	gitlab.com/greyxor/slogor v1.6.6 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.14.0 // indirect
-	go.opentelemetry.io/otel v1.39.0 // indirect
+	go.opentelemetry.io/otel v1.40.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.15.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.15.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.15.0 // indirect
 	go.opentelemetry.io/otel/log v0.15.0 // indirect
-	go.opentelemetry.io/otel/metric v1.39.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.39.0 // indirect
+	go.opentelemetry.io/otel/metric v1.40.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.40.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.15.0 // indirect
-	go.opentelemetry.io/otel/trace v1.39.0 // indirect
+	go.opentelemetry.io/otel/trace v1.40.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.9.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
