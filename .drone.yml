@@ -11,7 +11,7 @@ platform:
 
 steps:
   - name: linux amd64
-    image: quay.io/wasilak/golang:1.25-alpine
+    image: quay.io/wasilak/golang:1.26-alpine
     pull: if-not-exists
     environment:
       GOOS: linux
@@ -20,7 +20,7 @@ steps:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}
 
   - name: osx amd64
-    image: quay.io/wasilak/golang:1.25-alpine
+    image: quay.io/wasilak/golang:1.26-alpine
     pull: if-not-exists
     environment:
       GOOS: darwin
@@ -29,7 +29,7 @@ steps:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}
 
   - name: linux armv7
-    image: quay.io/wasilak/golang:1.25-alpine
+    image: quay.io/wasilak/golang:1.26-alpine
     pull: if-not-exists
     environment:
       GOOS: linux
@@ -39,7 +39,7 @@ steps:
       - go build -o dist/cloudflare-ddns-$${GOOS}-$${GOARCH}v$${GOARM}
 
   - name: linux arm64
-    image: quay.io/wasilak/golang:1.25-alpine
+    image: quay.io/wasilak/golang:1.26-alpine
     pull: if-not-exists
     environment:
       GOOS: linux
