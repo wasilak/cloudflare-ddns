@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/cloudflare/cloudflare-go/v4 v4.6.0
-	github.com/cloudflare/cloudflare-go/v6 v6.7.0
+	github.com/cloudflare/cloudflare-go/v6 v6.8.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.50.1
 	github.com/labstack/echo/v4 v4.15.1
