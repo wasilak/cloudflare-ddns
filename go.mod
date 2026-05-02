@@ -10,7 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.15.2
 	github.com/labstack/echo/v5 v5.1.1
 	github.com/prometheus/client_golang v1.23.2
-	github.com/samber/slog-echo v1.21.0
+	github.com/samber/slog-echo v1.22.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/wasilak/loggergo v1.8.2
@@ -42,7 +42,7 @@ require (
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.19.2 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
-	github.com/samber/lo v1.52.0 // indirect
+	github.com/samber/lo v1.53.0 // indirect
 	github.com/samber/slog-common v0.19.0 // indirect
 	github.com/samber/slog-multi v1.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
