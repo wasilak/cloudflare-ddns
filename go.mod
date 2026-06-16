@@ -7,7 +7,7 @@ require (
 	github.com/cloudflare/cloudflare-go/v7 v7.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.50.1
-	github.com/labstack/echo/v4 v4.15.4
+	github.com/labstack/echo/v4 v4.15.2
 	github.com/labstack/echo/v5 v5.2.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/samber/slog-echo v1.23.0
