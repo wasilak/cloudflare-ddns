@@ -10,7 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.16.0
 	github.com/labstack/echo/v5 v5.4.0
 	github.com/prometheus/client_golang v1.24.1
-	github.com/samber/slog-echo v1.23.0
+	github.com/samber/slog-echo/v2 v2.2.0
 	github.com/samber/slog-echo/v2 v2.2.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
