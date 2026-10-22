@@ -7,7 +7,7 @@ require (
 	github.com/cloudflare/cloudflare-go/v7 v7.13.1
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.50.1
-	github.com/labstack/echo/v4 v4.16.0
+	github.com/labstack/echo/v4 v4.16.1
 	github.com/labstack/echo/v5 v5.4.0
 	github.com/prometheus/client_golang v1.25.0
 	github.com/samber/slog-echo v1.23.0
@@ -76,7 +76,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
-	golang.org/x/net v0.59.0 // indirect
+	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
