@@ -8,7 +8,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-contrib v0.50.1
 	github.com/labstack/echo/v4 v4.16.3
-	github.com/labstack/echo/v5 v5.4.2
+	github.com/labstack/echo/v5 v5.4.4
 	github.com/prometheus/client_golang v1.25.0
 	github.com/samber/slog-echo v1.23.0
 	github.com/samber/slog-echo/v2 v2.2.0
